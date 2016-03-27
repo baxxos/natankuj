@@ -1,0 +1,15 @@
+DELETE FROM fuel_brands;
+DELETE FROM stations;
+DELETE FROM station_brands;
+DELETE FROM users;
+
+ALTER SEQUENCE hibernate_sequence RESTART WITH 1
+
+ALTER TABLE stations ADD CONSTRAINT "FK_brand_id" FOREIGN KEY (brand_id)
+      REFERENCES public.station_brands (id) MATCH SIMPLE
+      ON UPDATE CASCADE ON DELETE CASCADE
+
+//vypise pocet jednotlivych stanic podla znacky
+SELECT brand, count(*) FROM stations s
+JOIN station_brands sb ON s.brand_id = sb.id
+GROUP BY brand;

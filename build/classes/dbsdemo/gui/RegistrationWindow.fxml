@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.collections.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<AnchorPane id="AnchorPane" prefHeight="400.0" prefWidth="450.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/2.2" fx:controller="dbsdemo.RegistrationWindowController">
+  <children>
+    <Label layoutX="118.0" layoutY="21.0" text="Create an user account">
+      <font>
+        <Font name="System Bold Italic" size="20.0" />
+      </font>
+    </Label>
+    <TextField id="usernameTextField" fx:id="userNameTextField" layoutX="14.0" layoutY="101.0" onKeyTyped="#keyInputDetected" prefWidth="200.0" />
+    <Label layoutX="14.0" layoutY="69.0" text="Username">
+      <font>
+        <Font name="System Bold" size="15.0" fx:id="x1" />
+      </font>
+    </Label>
+    <Label font="$x1" layoutX="18.0" layoutY="136.0" text="Password" />
+    <Button fx:id="registerButton" disable="true" layoutX="183.0" layoutY="346.0" mnemonicParsing="false" onAction="#registerNewUser" prefHeight="40.0" prefWidth="81.0" text="Register" />
+    <Label font="$x1" layoutX="17.0" layoutY="209.0" text="Password again" />
+    <ComboBox fx:id="userLevelComboBox" layoutX="236.0" layoutY="239.0" prefWidth="200.0" promptText="User Level">
+      <items>
+        <FXCollections fx:factory="observableArrayList">
+          <String fx:value="0" />
+          <String fx:value="1" />
+        </FXCollections>
+      </items>
+    </ComboBox>
+    <PasswordField id="passwordTextField" fx:id="passwdTextField" layoutX="15.0" layoutY="166.0" onKeyTyped="#keyInputDetected" prefWidth="200.0" />
+    <PasswordField fx:id="passwdAgainTextField" layoutX="14.0" layoutY="239.0" onKeyTyped="#keyInputDetected" prefWidth="200.0" />
+    <TextField id="usernameTextField" fx:id="nameTextField" layoutX="236.0" layoutY="101.0" onKeyTyped="#keyInputDetected" prefWidth="200.0" />
+    <Label font="$x1" layoutX="236.0" layoutY="69.0" text="Name" />
+    <TextField id="usernameTextField" fx:id="surnameTextField" layoutX="236.0" layoutY="168.0" onKeyTyped="#keyInputDetected" prefWidth="200.0" />
+    <Label font="$x1" layoutX="236.0" layoutY="136.0" text="Surname" />
+    <Label font="$x1" layoutX="236.0" layoutY="213.0" text="User Level" />
+  </children>
+</AnchorPane>
