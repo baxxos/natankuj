@@ -17,6 +17,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
@@ -67,7 +68,6 @@ public class LoginWindowController implements Initializable {
             mainWindowStage.getScene().setRoot(root);
             
             mainWindowStage.show();
-            this.actStage.close();
         } catch (IOException ex) {
             Logger.getLogger(LoginWindowController.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -88,15 +88,19 @@ public class LoginWindowController implements Initializable {
             regWindowStage.setTitle("New user registration");
             regWindowStage.setMinHeight(regWindowStage.getHeight());
             regWindowStage.setMinWidth(regWindowStage.getWidth());
-            regWindowStage.setScene(this.actStage.getScene());
-            regWindowStage.getScene().setRoot(root);
+            regWindowStage.setScene(new Scene(root));
             
             RegistrationWindowController regWindowController = loader.getController();
             regWindowController.userLevelAvailable(false);
             regWindowController.setActStage(regWindowStage);
             
             regWindowStage.show();
-            this.actStage.close();
+            if(this.actStage != null){
+                this.actStage.close();
+            }
+            else {
+                regWindowController.setTriggerMainWindow(false);
+            }
         } catch (IOException ex) {
             Logger.getLogger(LoginWindowController.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -116,6 +120,7 @@ public class LoginWindowController implements Initializable {
             ).get(0);
             
             goToMainWindowScene(activeUser);
+            this.actStage.close();
         }
         catch(IndexOutOfBoundsException e) {
             new CustomAlert(

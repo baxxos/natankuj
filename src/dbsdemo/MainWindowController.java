@@ -5,17 +5,24 @@ import dbsdemo.sql.DatabaseControl;
 import dbsdemo.sql.custom.StationBrandsDao;
 import dbsdemo.sql.custom.StationDao;
 import dbsdemo.entities.Station;
+import dbsdemo.misc.PropLoader;
 import dbsdemo.sql.custom.CityDao;
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 import java.util.ResourceBundle;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.ContextMenu;
@@ -65,17 +72,34 @@ public class MainWindowController implements Initializable {
     private ComboBox<String> cityComboBox;
     @FXML
     private Label userNameLabel;
+    @FXML
+    private ComboBox<String> actionComboBox;
+    @FXML
+    private ComboBox<String> actionTargetComboBox;
     
     private User activeUser;
     private ObservableList<String> brands;
     private ObservableList<String> cities;
+    private ObservableList<String> actions;
+    private ObservableList<String> actionTargets;
     
     public void populateComboBoxes(){
         
         this.brands = FXCollections.observableArrayList(new StationBrandsDao().getStationBrandsString());
         this.cities = FXCollections.observableArrayList(new CityDao().getCitiesAsString());
-        cityComboBox.setItems(this.cities);
-        brandsComboBox.setItems(this.brands);
+        this.actions = FXCollections.observableArrayList();
+        this.actionTargets = FXCollections.observableArrayList();
+        
+        this.actions.add("Pridať");
+        this.actions.add("Vymazať");
+        
+        this.actionTargets.add("Čerpacia stanica");
+        this.actionTargets.add("Používateľ");
+        
+        this.actionComboBox.setItems(this.actions);
+        this.actionTargetComboBox.setItems(this.actionTargets);
+        this.cityComboBox.setItems(this.cities);
+        this.brandsComboBox.setItems(this.brands);
     }
     
     public void populateTable(){
@@ -135,6 +159,30 @@ public class MainWindowController implements Initializable {
         DatabaseControl.recreateTables();
         this.populateComboBoxes();
         this.populateTable();
+    }
+    
+    @FXML
+    private void fireUserAction(ActionEvent event) throws IOException {
+        
+        try {
+            switch(this.actionComboBox.getValue()){
+                case("Pridať"):
+                    if(this.actionTargetComboBox.getValue().equals("Používateľ")){
+                        Properties prop = PropLoader.load("etc/config.properties");
+                        FXMLLoader loader = new FXMLLoader(getClass().getResource(prop.getProperty("LoginWindowPath")));
+                        loader.load();
+                        
+                        LoginWindowController loginWindowController = loader.getController();
+                        loginWindowController.goToRegWindowScene();
+                    }
+                    break;
+                case("Vymazať"):
+                    break;
+            }
+        } catch(NullPointerException e){
+            //Nothing selected in combo boxes
+            Logger.getLogger(MainWindowController.class.getName()).log(Level.SEVERE, null, e);
+        }
     }
 
     public TableView<?> getTableView() {

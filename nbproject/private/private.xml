@@ -5,13 +5,11 @@
         <group>
             <file>file:/C:/Users/Baxos/Desktop/NetBeans/natankuj/src/dbsdemo/MainWindowController.java</file>
             <file>file:/C:/Users/Baxos/Desktop/NetBeans/natankuj/etc/SQLcommands</file>
-            <file>file:/C:/Users/Baxos/Desktop/NetBeans/natankuj/src/dbsdemo/sql/custom/StationBrandsDao.java</file>
-            <file>file:/C:/Users/Baxos/Desktop/NetBeans/natankuj/src/dbsdemo/entities/Station.java</file>
-            <file>file:/C:/Users/Baxos/Desktop/NetBeans/natankuj/src/dbsdemo/parsing/StationParser.java</file>
-            <file>file:/C:/Users/Baxos/Desktop/NetBeans/natankuj/src/dbsdemo/sql/HibernateUtil.java</file>
-            <file>file:/C:/Users/Baxos/Desktop/NetBeans/natankuj/src/dbsdemo/sql/custom/CityDao.java</file>
-            <file>file:/C:/Users/Baxos/Desktop/NetBeans/natankuj/src/dbsdemo/entities/StationBrand.java</file>
-            <file>file:/C:/Users/Baxos/Desktop/NetBeans/natankuj/src/dbsdemo/entities/City.java</file>
+            <file>file:/C:/Users/Baxos/Desktop/NetBeans/natankuj/src/dbsdemo/DBSdemo.java</file>
+            <file>file:/C:/Users/Baxos/Desktop/NetBeans/natankuj/src/dbsdemo/LoginWindowController.java</file>
+            <file>file:/C:/Users/Baxos/Desktop/NetBeans/natankuj/src/dbsdemo/RegistrationWindowController.java</file>
+            <file>file:/C:/Users/Baxos/Desktop/NetBeans/natankuj/etc/config.properties</file>
+            <file>file:/C:/Users/Baxos/Desktop/NetBeans/natankuj/src/dbsdemo/gui/RegistrationWindow.fxml</file>
         </group>
     </open-files>
 </project-private>

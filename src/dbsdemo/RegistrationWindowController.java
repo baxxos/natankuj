@@ -7,12 +7,14 @@ package dbsdemo;
 
 import dbsdemo.misc.CustomAlert;
 import dbsdemo.entities.User;
+import dbsdemo.misc.PropLoader;
 import dbsdemo.sql.custom.UserDao;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Properties;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -21,6 +23,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
@@ -51,13 +54,13 @@ public class RegistrationWindowController implements Initializable {
     private PasswordField passwdAgainTextField;
     @FXML
     private TextField userNameTextField;
-    
-    private Stage actStage;
-    private Stage prevStage;
     @FXML
     private TextField nameTextField;
     @FXML
     private TextField surnameTextField;
+    
+    private Stage actStage;
+    private boolean triggerMainWindow = true;
     
     private void checkForFilledFields(){
         
@@ -130,19 +133,20 @@ public class RegistrationWindowController implements Initializable {
             md = MessageDigest.getInstance("SHA-1");
             md.update(passwdTextField.getText().getBytes(Charset.forName("UTF-8")));
         
+            User user = new User(
+                    userNameTextField.getText(),
+                    new String(Hex.encodeHex(md.digest())),
+                    nameTextField.getText(),
+                    surnameTextField.getText(),
+                    userLevelComboBox.getValue() == null ? 0 : userLevelComboBox.getValue()
+            );
 
-        User user = new User(
-                userNameTextField.getText(),
-                new String(Hex.encodeHex(md.digest())),
-                nameTextField.getText(),
-                surnameTextField.getText(),
-                userLevelComboBox.getValue() == null ? 0 : userLevelComboBox.getValue()
-        );
-
-        new UserDao().insert(user);
-        
-        //trigger the main application window
-        goToMainWindowScene("gui/MainWindow.fxml");
+            new UserDao().insert(user);
+            // Trigger the main application window if needed
+            if(this.triggerMainWindow){
+                goToMainWindowScene(user);
+            }
+            this.actStage.close();
         } catch (NoSuchAlgorithmException ex) {
             Logger.getLogger(RegistrationWindowController.class.getName()).log(Level.SEVERE, null, ex);
         } catch (ConstraintViolationException ex ) {
@@ -163,26 +167,25 @@ public class RegistrationWindowController implements Initializable {
         checkForFilledFields();
     }
     
-    public void goToMainWindowScene(String fxmlPath){
-        // Try loading a fxml scene file
-        // TODO create a static loader - more than one class triggers mainWindow
+    public void goToMainWindowScene(User user){
+        // Load properties file - TODO catch exception
+        Properties prop = PropLoader.load("etc/config.properties");
+        // Continue to main window screen
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(prop.getProperty("MainWindowPath")));
             Parent root = (Parent) loader.load();
             
             MainWindowController mainWindowController = loader.getController();
-            mainWindowController.populateTable();
+            mainWindowController.setActiveUser(user);
             
             //Scene scene = new Scene(root);
             Stage mainWindowStage = new Stage();
             mainWindowStage.setTitle("Fuel database");
             mainWindowStage.setMinHeight(mainWindowStage.getHeight());
             mainWindowStage.setMinWidth(mainWindowStage.getWidth());
-            mainWindowStage.setScene(this.actStage.getScene());
-            mainWindowStage.getScene().setRoot(root);
+            mainWindowStage.setScene(new Scene(root));
             
             mainWindowStage.show();
-            this.actStage.close();
         } catch (IOException ex) {
             Logger.getLogger(LoginWindowController.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -190,5 +193,9 @@ public class RegistrationWindowController implements Initializable {
     
     public void setActStage(Stage stage){
         this.actStage = stage;
+    }
+
+    public void setTriggerMainWindow(boolean triggerMainWindow) {
+        this.triggerMainWindow = triggerMainWindow;
     }
 }
