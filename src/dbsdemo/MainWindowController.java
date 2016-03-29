@@ -23,6 +23,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.ContextMenu;
@@ -35,6 +36,7 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Region;
 import javafx.scene.text.Font;
+import javafx.stage.Stage;
 
 /**
  * FXML Controller class
@@ -140,7 +142,7 @@ public class MainWindowController implements Initializable {
         
         ContextMenu contextMenu = new ContextMenu();
         contextMenu.getItems().add(new MenuItem("Ohodnotiť stanicu"));
-        contextMenu.getItems().add(new MenuItem("Aktualizovať cenu"));
+        contextMenu.getItems().add(new MenuItem("Aktualizovať cenu"));        
         addContextMenu(tableView, contextMenu);
     }    
 
@@ -168,15 +170,13 @@ public class MainWindowController implements Initializable {
             switch(this.actionComboBox.getValue()){
                 case("Pridať"):
                     if(this.actionTargetComboBox.getValue().equals("Používateľ")){
-                        Properties prop = PropLoader.load("etc/config.properties");
-                        FXMLLoader loader = new FXMLLoader(getClass().getResource(prop.getProperty("LoginWindowPath")));
-                        loader.load();
-                        
-                        LoginWindowController loginWindowController = loader.getController();
-                        loginWindowController.goToRegWindowScene();
+                        goToRegWindowScene();
                     }
                     break;
                 case("Vymazať"):
+                    if(this.actionTargetComboBox.getValue().equals("Používateľ")){
+                        ;
+                    }
                     break;
             }
         } catch(NullPointerException e){
@@ -185,36 +185,29 @@ public class MainWindowController implements Initializable {
         }
     }
 
-    public TableView<?> getTableView() {
-        return tableView;
-    }
-
-    public TableColumn<?, ?> getColBrand() {
-        return colBrand;
-    }
-
-    public TableColumn<?, ?> getColCity() {
-        return colCity;
-    }
-
-    public TableColumn<?, ?> getColLocation() {
-        return colLocation;
-    }
-
-    public TableColumn<?, ?> getColRating() {
-        return colRating;
-    }
-
-    public TableColumn<?, ?> getColFuelName() {
-        return colFuelName;
-    }
-
-    public TableColumn<?, ?> getColPrice() {
-        return colPrice;
-    }
-
-    public TableColumn<?, ?> getColDate() {
-        return colDate;
+    public void goToRegWindowScene(){  
+        // Load properties file - TODO catch exception
+        Properties prop = PropLoader.load("etc/config.properties");
+        // Continue to user registration screen
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(prop.getProperty("RegWindowPath")));
+            Parent root = (Parent) loader.load();
+            
+            Stage regWindowStage = new Stage();
+            regWindowStage.setTitle("New user registration");
+            regWindowStage.setMinHeight(regWindowStage.getHeight());
+            regWindowStage.setMinWidth(regWindowStage.getWidth());
+            regWindowStage.setScene(new Scene(root));
+            
+            RegistrationWindowController regWindowController = loader.getController();
+            regWindowController.userLevelAvailable(this.activeUser.getUserLevel() > 1);
+            regWindowController.setTriggerMainWindow(false);
+            regWindowController.setActStage(regWindowStage);
+            
+            regWindowStage.show();
+        } catch (IOException ex) {
+            Logger.getLogger(LoginWindowController.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     public User getActiveUser() {

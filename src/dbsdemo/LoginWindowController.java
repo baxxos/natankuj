@@ -75,11 +75,9 @@ public class LoginWindowController implements Initializable {
     
     @FXML
     public void goToRegWindowScene(){
-        
         // Load properties file - TODO catch exception
         Properties prop = PropLoader.load("etc/config.properties");
         // Continue to user registration screen
-        
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource(prop.getProperty("RegWindowPath")));
             Parent root = (Parent) loader.load();

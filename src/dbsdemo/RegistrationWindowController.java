@@ -115,7 +115,6 @@ public class RegistrationWindowController implements Initializable {
     }    
     
     public void userLevelAvailable(boolean value){
-        
         this.userLevelComboBox.setDisable(!value);
     }
 
