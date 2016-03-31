@@ -149,13 +149,13 @@ public class RegistrationWindowController implements Initializable {
         } catch (NoSuchAlgorithmException ex) {
             Logger.getLogger(RegistrationWindowController.class.getName()).log(Level.SEVERE, null, ex);
         } catch (ConstraintViolationException ex ) {
+            // Username already taken
             new CustomAlert(
-                    Alert.AlertType.WARNING,
-                    "Error",
-                    "Registration unsuccessful",
-                    "Username is already taken. Please choose a different username and try again."
+                Alert.AlertType.WARNING,
+                "Error",
+                "Registration unsuccessful",
+                "Username is already taken. Please choose a different username and try again."
             ).showAndWait();
-            
             Logger.getLogger(RegistrationWindowController.class.getName()).log(Level.SEVERE, null, ex);
         }
     }

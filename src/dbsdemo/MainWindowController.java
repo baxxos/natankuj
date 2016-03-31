@@ -5,12 +5,11 @@ import dbsdemo.sql.DatabaseControl;
 import dbsdemo.sql.custom.StationBrandsDao;
 import dbsdemo.sql.custom.StationDao;
 import dbsdemo.entities.Station;
+import dbsdemo.misc.CustomAlert;
 import dbsdemo.misc.PropLoader;
 import dbsdemo.sql.custom.CityDao;
 import java.io.IOException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Properties;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
@@ -24,11 +23,14 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.TabPane;
+import javafx.scene.control.TabPane.TabClosingPolicy;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -44,8 +46,12 @@ import javafx.stage.Stage;
  * @author Baxos
  */
 public class MainWindowController implements Initializable {
+    // Table related components
     @FXML
     private TableView<Station> tableView;
+    private TableView<User> tableViewUsers;
+    @FXML
+    private TabPane tabPaneMain;
     @FXML
     private TableColumn<Station, String> colBrand;
     @FXML
@@ -60,25 +66,30 @@ public class MainWindowController implements Initializable {
     private TableColumn<?, ?> colPrice;
     @FXML
     private TableColumn<?, ?> colDate;
+    // Button GUI components
     @FXML
-    private Font x1;
+    private Button fireUserActionButton;
     @FXML
     private Button filterButton;
     @FXML
     private Button updateButton;
     @FXML
     private Button dropCreateButton;
+    // Combo Boxes
     @FXML
     private ComboBox<String> brandsComboBox;
     @FXML
     private ComboBox<String> cityComboBox;
     @FXML
-    private Label userNameLabel;
-    @FXML
     private ComboBox<String> actionComboBox;
     @FXML
     private ComboBox<String> actionTargetComboBox;
-    
+    // Misc GUI components
+    @FXML
+    private Label userNameLabel;
+    @FXML
+    private Font x1;
+    // Controller private attributes
     private User activeUser;
     private ObservableList<String> brands;
     private ObservableList<String> cities;
@@ -92,12 +103,6 @@ public class MainWindowController implements Initializable {
         this.actions = FXCollections.observableArrayList();
         this.actionTargets = FXCollections.observableArrayList();
         
-        this.actions.add("Pridať");
-        this.actions.add("Vymazať");
-        
-        this.actionTargets.add("Čerpacia stanica");
-        this.actionTargets.add("Používateľ");
-        
         this.actionComboBox.setItems(this.actions);
         this.actionTargetComboBox.setItems(this.actionTargets);
         this.cityComboBox.setItems(this.cities);
@@ -110,16 +115,13 @@ public class MainWindowController implements Initializable {
         colBrand.setCellValueFactory(
             new PropertyValueFactory<>("brand")
         );
-        
         colCity.setCellValueFactory(
             new PropertyValueFactory<>("city")
         );
-        
         colLocation.setCellValueFactory(
             new PropertyValueFactory<>("location")
         );
-        
-        tableView.setItems(stations);
+        this.tableView.setItems(stations);
     }
     
     private void addContextMenu(Region region, ContextMenu menu){
@@ -134,12 +136,26 @@ public class MainWindowController implements Initializable {
         });
     }
     
+    private void addUsersTab() throws IOException {
+        
+        Properties prop = PropLoader.load("etc/config.properties");
+        FXMLLoader loader = new FXMLLoader(getClass().getResource(prop.getProperty("UsersTabPath")));
+        Parent root = (Parent) loader.load();
+        UsersTabController usersTabController = loader.getController();  
+        usersTabController.populateUserList();
+        // Add user list tab to current view and make it active
+        this.tabPaneMain.getTabs().add(usersTabController.getUserListTab());
+        this.tabPaneMain.getSelectionModel().select(this.tabPaneMain.getTabs().size()-1);
+        this.tableViewUsers = usersTabController.getTableViewUsers();
+    }
+    
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        
+        // Populate content in comboBoxes and tableViews
         this.populateTable();
         this.populateComboBoxes();
-        
+        this.tabPaneMain.setTabClosingPolicy(TabClosingPolicy.ALL_TABS);
+        // Add context menu on tableView items
         ContextMenu contextMenu = new ContextMenu();
         contextMenu.getItems().add(new MenuItem("Ohodnotiť stanicu"));
         contextMenu.getItems().add(new MenuItem("Aktualizovať cenu"));        
@@ -167,20 +183,30 @@ public class MainWindowController implements Initializable {
     private void fireUserAction(ActionEvent event) throws IOException {
         
         try {
-            switch(this.actionComboBox.getValue()){
-                case("Pridať"):
-                    if(this.actionTargetComboBox.getValue().equals("Používateľ")){
-                        goToRegWindowScene();
-                    }
-                    break;
-                case("Vymazať"):
-                    if(this.actionTargetComboBox.getValue().equals("Používateľ")){
-                        ;
-                    }
-                    break;
+            String action = this.actionComboBox.getValue();
+            String actionTarget = this.actionTargetComboBox.getValue();
+            
+            if(actionTarget.equals("Používateľ")){
+                if(action.equals("Pridať")){
+                    goToRegWindowScene();
+                }
+                else if((action.equals("Upraviť") ||
+                        action.equals("Vymazať")) &&
+                        this.tabPaneMain.getTabs().size() < 3){
+                        addUsersTab();
+                }
+            }
+            else if(actionTarget.equals("Čerpacia stanica")){
+                ;
             }
         } catch(NullPointerException e){
             //Nothing selected in combo boxes
+            new CustomAlert(
+                    Alert.AlertType.WARNING,
+                    "Warning",
+                    "Action unsuccessful",
+                    "Please select a valid action and action target"
+            ).showAndWait();
             Logger.getLogger(MainWindowController.class.getName()).log(Level.SEVERE, null, e);
         }
     }
@@ -210,12 +236,28 @@ public class MainWindowController implements Initializable {
         }
     }
 
-    public User getActiveUser() {
-        return activeUser;
-    }
-
     public void setActiveUser(User activeUser) {
         this.activeUser = activeUser;
         this.userNameLabel.setText("Logged in as: " + (this.activeUser == null ? "-" : this.activeUser.getUsername()));
+        // Control the user actions based on userLevel
+        if(this.activeUser.getUserLevel() > 0){
+            this.actions.add("Pridať");
+            this.actions.add("Upraviť");
+            this.actionTargets.add("Čerpacia stanica");
+            this.actionTargets.add("Používateľ");
+        }
+        else {
+            this.fireUserActionButton.setDisable(true);
+            this.actionComboBox.setDisable(true);
+            this.actionTargetComboBox.setDisable(true);
+        }
+        // superUser (admin) actions
+        if(this.activeUser.getUserLevel() > 1){
+            this.actions.add("Vymazať");
+        }
+    }
+    
+    public User getActiveUser() {
+        return activeUser;
     }
 }

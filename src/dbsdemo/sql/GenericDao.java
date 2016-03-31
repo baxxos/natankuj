@@ -82,5 +82,4 @@ public class GenericDao<T> implements GenericDaoMethods<T> {
         
         session.close();
     }
-    
 }
