@@ -93,15 +93,13 @@ public class MainWindowController implements Initializable {
     private User activeUser;
     private ObservableList<String> brands;
     private ObservableList<String> cities;
-    private ObservableList<String> actions;
-    private ObservableList<String> actionTargets;
+    private final ObservableList<String> actions = FXCollections.observableArrayList();
+    private final ObservableList<String> actionTargets = FXCollections.observableArrayList();
     
     public void populateComboBoxes(){
         
         this.brands = FXCollections.observableArrayList(new StationBrandsDao().getStationBrandsString());
         this.cities = FXCollections.observableArrayList(new CityDao().getCitiesAsString());
-        this.actions = FXCollections.observableArrayList();
-        this.actionTargets = FXCollections.observableArrayList();
         
         this.actionComboBox.setItems(this.actions);
         this.actionTargetComboBox.setItems(this.actionTargets);
@@ -142,7 +140,6 @@ public class MainWindowController implements Initializable {
         FXMLLoader loader = new FXMLLoader(getClass().getResource(prop.getProperty("UsersTabPath")));
         Parent root = (Parent) loader.load();
         UsersTabController usersTabController = loader.getController();  
-        usersTabController.populateUserList();
         // Add user list tab to current view and make it active
         this.tabPaneMain.getTabs().add(usersTabController.getUserListTab());
         this.tabPaneMain.getSelectionModel().select(this.tabPaneMain.getTabs().size()-1);
