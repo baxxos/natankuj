@@ -130,6 +130,9 @@ public class MainWindowController implements Initializable {
                 if(t.getButton() == MouseButton.SECONDARY){
                     menu.show(tableView , t.getScreenX() , t.getScreenY());
                 }
+                else {
+                    menu.hide();
+                }
             }
         });
     }
@@ -140,6 +143,10 @@ public class MainWindowController implements Initializable {
         FXMLLoader loader = new FXMLLoader(getClass().getResource(prop.getProperty("UsersTabPath")));
         Parent root = (Parent) loader.load();
         UsersTabController usersTabController = loader.getController();  
+        // Make tables editable if admin user is logged in 
+        if(this.activeUser.getUserLevel() > 1){
+            usersTabController.enableEditing();
+        }
         // Add user list tab to current view and make it active
         this.tabPaneMain.getTabs().add(usersTabController.getUserListTab());
         this.tabPaneMain.getSelectionModel().select(this.tabPaneMain.getTabs().size()-1);

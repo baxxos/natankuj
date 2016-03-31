@@ -17,9 +17,9 @@
                 <TableView fx:id="tableViewUsers" prefHeight="359.0" prefWidth="600.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                   <columns>
                     <TableColumn prefWidth="150.0" text="Používateľské meno" />
-                    <TableColumn prefWidth="150.0" text="Meno" />
-                    <TableColumn prefWidth="150.0" text="Priezvisko" />
-                    <TableColumn prefWidth="150.0" text="UserLevel" />
+                    <TableColumn prefWidth="150.0" text="Meno" fx:id="colName" />
+                    <TableColumn prefWidth="150.0" text="Priezvisko" fx:id="colSurname" />
+                    <TableColumn prefWidth="150.0" text="UserLevel" fx:id="colUserLevel" />
                   </columns>
                 </TableView>
               </children>

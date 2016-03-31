@@ -1,5 +1,6 @@
 package dbsdemo.sql;
 
+import dbsdemo.entities.User;
 import java.util.List;
 import javax.persistence.Table;
 import org.hibernate.SQLQuery;
@@ -51,6 +52,22 @@ public class GenericDao<T> implements GenericDaoMethods<T> {
         }
         t.commit();
         session.close();
+    }
+    
+    @Override
+    public T getById(int id){
+        sf = HibernateUtil.getSessionFactory();
+        Session session = sf.openSession();
+        Table table = (Table) this.type.getAnnotation(Table.class);
+        String select = "SELECT * FROM " + table.name() + " WHERE id =:id";
+        SQLQuery query = session.createSQLQuery(select);
+        
+        T result = (T) query
+                .addEntity(this.type)
+                .setParameter("id", id).uniqueResult();
+
+        session.close();
+        return result;
     }
 
     @Override

@@ -14,8 +14,5 @@ SELECT brand, count(*) FROM stations s
 JOIN station_brands sb ON s.brand_id = sb.id
 GROUP BY brand;
 
-contextMenu.getItems().get(0).setOnAction(new EventHandler<ActionEvent>() {
-    public void handle(ActionEvent e) {
-        System.out.println(tableView.getColumns().get(0).getCellData(0));
-    }
-});
+//update riadku
+UPDATE users SET name = 'Marcus', surname = 'Revajovic' WHERE username = 'mrevaj';
