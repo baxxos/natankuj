@@ -56,6 +56,7 @@ public class GenericDao<T> implements GenericDaoMethods<T> {
     
     @Override
     public T getById(int id){
+        
         sf = HibernateUtil.getSessionFactory();
         Session session = sf.openSession();
         Table table = (Table) this.type.getAnnotation(Table.class);
@@ -86,9 +87,26 @@ public class GenericDao<T> implements GenericDaoMethods<T> {
         session.close();
         return result;
     }
+    
+    @Override
+    public void deleteRecord(int id){
+        
+        sf = HibernateUtil.getSessionFactory();
+        Session session = sf.openSession();
+        Transaction t = session.beginTransaction();
+        Table table = (Table) this.type.getAnnotation(Table.class);
+        String sql = "DELETE FROM " + table.name() + " WHERE id =:id";
+        
+        SQLQuery query = session.createSQLQuery(sql);        
+        query.setParameter("id", id).executeUpdate();
+
+        t.commit();
+        session.close();
+    }
 
     @Override
     public void eraseTable() {
+        
         sf = HibernateUtil.getSessionFactory();
         Session session = sf.openSession();
         Table table = (Table) this.type.getAnnotation(Table.class);
@@ -96,7 +114,7 @@ public class GenericDao<T> implements GenericDaoMethods<T> {
         
         SQLQuery query = session.createSQLQuery(sql);        
         query.executeUpdate();
-        
+
         session.close();
     }
 }

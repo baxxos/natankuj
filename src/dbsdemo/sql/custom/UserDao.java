@@ -25,12 +25,14 @@ public class UserDao extends GenericDao<User> {
         Transaction t = session.beginTransaction();
         String select = "UPDATE users SET name =:name, surname =:surname, userlevel =:userlevel WHERE id =:id";
         SQLQuery query = session.createSQLQuery(select);
+        
         query
                 .setParameter("name", user.getName())
                 .setParameter("surname", user.getSurname())
                 .setParameter("userlevel", user.getUserLevel())
                 .setParameter("id", user.getId())
                 .executeUpdate();
+        
         t.commit();
         session.close();
     }

@@ -8,6 +8,7 @@ import dbsdemo.entities.Station;
 import dbsdemo.misc.CustomAlert;
 import dbsdemo.misc.PropLoader;
 import dbsdemo.sql.custom.CityDao;
+import dbsdemo.sql.custom.UserDao;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Properties;
@@ -34,6 +35,7 @@ import javafx.scene.control.TabPane.TabClosingPolicy;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Region;
@@ -93,6 +95,7 @@ public class MainWindowController implements Initializable {
     private User activeUser;
     private ObservableList<String> brands;
     private ObservableList<String> cities;
+    private ObservableList<Station> stations;
     private final ObservableList<String> actions = FXCollections.observableArrayList();
     private final ObservableList<String> actionTargets = FXCollections.observableArrayList();
     
@@ -108,7 +111,7 @@ public class MainWindowController implements Initializable {
     }
     
     public void populateTable(){
-        ObservableList<Station> stations = FXCollections.observableArrayList(new StationDao().getAllAsObjects());
+        this.stations = FXCollections.observableArrayList(new StationDao().getAllAsObjects());
 
         colBrand.setCellValueFactory(
             new PropertyValueFactory<>("brand")
@@ -122,17 +125,33 @@ public class MainWindowController implements Initializable {
         this.tableView.setItems(stations);
     }
     
-    private void addContextMenu(Region region, ContextMenu menu){
+    private void addContextMenu(Region region){
         
+        ContextMenu contextMenu = new ContextMenu();
+        contextMenu.getItems().add(new MenuItem("Ohodnotiť stanicu"));
+        contextMenu.getItems().add(new MenuItem("Aktualizovať cenu")); 
+        // Restrict low level users from deleting records
+        MenuItem recDeletion = new MenuItem("Vymazať záznam");
+        recDeletion.setDisable(this.activeUser.getUserLevel() < 2);
+        contextMenu.getItems().add(recDeletion);
+
         region.addEventHandler(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent t) {
                 if(t.getButton() == MouseButton.SECONDARY){
-                    menu.show(tableView , t.getScreenX() , t.getScreenY());
+                    contextMenu.show(tableView , t.getScreenX() , t.getScreenY());
                 }
                 else {
-                    menu.hide();
+                    contextMenu.hide();
                 }
+            }
+        });
+        
+        contextMenu.getItems().get(2).setOnAction(new EventHandler<ActionEvent>() {
+            public void handle(ActionEvent e) {
+                Station station = tableView.getSelectionModel().getSelectedItem();
+                MainWindowController.this.stations.remove(station);
+                new StationDao().deleteRecord(station.getId());
             }
         });
     }
@@ -159,12 +178,27 @@ public class MainWindowController implements Initializable {
         this.populateTable();
         this.populateComboBoxes();
         this.tabPaneMain.setTabClosingPolicy(TabClosingPolicy.ALL_TABS);
-        // Add context menu on tableView items
-        ContextMenu contextMenu = new ContextMenu();
-        contextMenu.getItems().add(new MenuItem("Ohodnotiť stanicu"));
-        contextMenu.getItems().add(new MenuItem("Aktualizovať cenu"));        
-        addContextMenu(tableView, contextMenu);
     }    
+    
+    public void enableEditing(){
+        // Add context menu for record deletion
+        addContextMenu(tableView);
+        // Make selected table fields editable if needed
+        this.tableView.setEditable(this.activeUser.getUserLevel() > 0);
+        this.colLocation.setEditable(this.activeUser.getUserLevel() > 0);
+        
+        this.colLocation.setCellFactory(TextFieldTableCell.forTableColumn());
+        this.colLocation.setOnEditCommit(
+                new EventHandler<TableColumn.CellEditEvent<Station, String>>() {
+                    @Override
+                    public void handle(TableColumn.CellEditEvent<Station, String> t) {
+                        Station station = tableView.getSelectionModel().getSelectedItem();
+                        station.setLocation(t.getNewValue());
+                        new StationDao().updateStation(station);
+                    }
+                }
+        );
+    }
 
     @FXML
     private void filterButtonAction(ActionEvent event) throws IOException {
@@ -201,7 +235,10 @@ public class MainWindowController implements Initializable {
                 }
             }
             else if(actionTarget.equals("Čerpacia stanica")){
-                ;
+                if(action.equals("Upraviť") ||
+                    action.equals("Vymazať")){
+                    this.tabPaneMain.getSelectionModel().select(1);
+                }
             }
         } catch(NullPointerException e){
             //Nothing selected in combo boxes
@@ -241,8 +278,11 @@ public class MainWindowController implements Initializable {
     }
 
     public void setActiveUser(User activeUser) {
+        // Assign active user - needed for editing etc.
         this.activeUser = activeUser;
         this.userNameLabel.setText("Logged in as: " + (this.activeUser == null ? "-" : this.activeUser.getUsername()));
+        // Enable editing - editing level is handled by method itself
+        enableEditing();
         // Control the user actions based on userLevel
         if(this.activeUser.getUserLevel() > 0){
             this.actions.add("Pridať");

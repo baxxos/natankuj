@@ -11,5 +11,6 @@ public interface GenericDaoMethods<T> {
     public void insert(List<T> entityList);
     public T getById(int id);
     public List<T> getAllAsObjects();
+    public void deleteRecord(int id);
     public void eraseTable();
 }

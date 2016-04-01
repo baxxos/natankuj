@@ -39,30 +39,23 @@ public class UsersTabController implements Initializable {
     private TableColumn<User, String> colSurname;
     @FXML
     private TableColumn<User, Integer> colUserLevel;
+    
+    private ObservableList<User> users;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         
         populateUserList();
-        // Add context menu on tableView items
-        ContextMenu contextMenu = new ContextMenu();
-        contextMenu.getItems().add(new MenuItem("Vymazať používateľa"));   
-        addContextMenu(tableViewUsers, contextMenu);
-        
-        contextMenu.getItems().get(0).setOnAction(new EventHandler<ActionEvent>() {
-            public void handle(ActionEvent e) {
-                System.out.println(tableViewUsers.getSelectionModel().getSelectedItem().getUsername());
-                System.out.println(new UserDao().getById(tableViewUsers.getSelectionModel().getSelectedItem().getId()).getUsername());
-            }
-        });
     }
     
     public void enableEditing(){
-        
+        // Add context menu for record deletion
+        addContextMenu(tableViewUsers);
+        // Make selected table fields editable
         this.tableViewUsers.setEditable(true);
         this.colName.setEditable(true);
         this.colSurname.setEditable(true);
-        
+        // Configure editing actions and handlers
         colName.setCellFactory(TextFieldTableCell.forTableColumn());
         colName.setOnEditCommit(
                 new EventHandler<CellEditEvent<User, String>>() {
@@ -102,7 +95,7 @@ public class UsersTabController implements Initializable {
     
     public void populateUserList(){
         
-        ObservableList<User> users = FXCollections.observableArrayList(new UserDao().getAllAsObjects());
+        users = FXCollections.observableArrayList(new UserDao().getAllAsObjects());
 
         this.tableViewUsers.getColumns().get(0).setCellValueFactory(
             new PropertyValueFactory<>("username")
@@ -119,17 +112,28 @@ public class UsersTabController implements Initializable {
         this.tableViewUsers.setItems(users);
     }
     
-    private void addContextMenu(Region region, ContextMenu menu){
+    private void addContextMenu(Region region){
+        
+        ContextMenu contextMenu = new ContextMenu();
+        contextMenu.getItems().add(new MenuItem("Vymazať používateľa")); 
         
         region.addEventHandler(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent t) {
                 if(t.getButton() == MouseButton.SECONDARY){
-                    menu.show(tableViewUsers , t.getScreenX() , t.getScreenY());
+                    contextMenu.show(tableViewUsers , t.getScreenX() , t.getScreenY());
                 }
                 else {
-                    menu.hide();
+                    contextMenu.hide();
                 }
+            }
+        });
+        
+        contextMenu.getItems().get(0).setOnAction(new EventHandler<ActionEvent>() {
+            public void handle(ActionEvent e) {
+                User user = tableViewUsers.getSelectionModel().getSelectedItem();
+                UsersTabController.this.users.remove(user);
+                new UserDao().deleteRecord(user.getId());
             }
         });
     }
