@@ -1,5 +1,6 @@
 package dbsdemo;
 
+import dbsdemo.entities.Rating;
 import dbsdemo.entities.User;
 import dbsdemo.sql.DatabaseControl;
 import dbsdemo.sql.custom.StationBrandsDao;
@@ -7,10 +8,13 @@ import dbsdemo.sql.custom.StationDao;
 import dbsdemo.entities.Station;
 import dbsdemo.misc.CustomAlert;
 import dbsdemo.misc.PropLoader;
+import dbsdemo.sql.HibernateUtil;
 import dbsdemo.sql.custom.CityDao;
+import dbsdemo.sql.custom.RatingDao;
 import dbsdemo.sql.custom.UserDao;
 import java.io.IOException;
 import java.net.URL;
+import java.util.NoSuchElementException;
 import java.util.Properties;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
@@ -34,6 +38,7 @@ import javafx.scene.control.TabPane;
 import javafx.scene.control.TabPane.TabClosingPolicy;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.input.MouseButton;
@@ -41,6 +46,8 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Region;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 
 /**
  * FXML Controller class
@@ -61,7 +68,7 @@ public class MainWindowController implements Initializable {
     @FXML
     private TableColumn<Station, String> colLocation;
     @FXML
-    private TableColumn<?, ?> colRating;
+    private TableColumn<Station, Double> colRating;
     @FXML
     private TableColumn<?, ?> colFuelName;
     @FXML
@@ -122,6 +129,9 @@ public class MainWindowController implements Initializable {
         colLocation.setCellValueFactory(
             new PropertyValueFactory<>("location")
         );
+        colRating.setCellValueFactory(
+            new PropertyValueFactory<>("ratings")
+        );
         this.tableView.setItems(stations);
     }
     
@@ -147,7 +157,64 @@ public class MainWindowController implements Initializable {
             }
         });
         
+        contextMenu.getItems().get(0).setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent e) {
+                Station station = tableView.getSelectionModel().getSelectedItem();
+                
+                Rating rating = new Rating();
+                rating.setStation(station);
+                rating.setUser(activeUser);
+                
+                TextInputDialog dialog = new TextInputDialog("5.0");
+                dialog.setContentText("Content text");
+                dialog.setHeaderText("Header text");
+                dialog.setTitle("Title");
+                
+                String response;
+                CustomAlert wrongInputAlert = new CustomAlert(
+                    Alert.AlertType.ERROR,
+                    "Error",
+                    "Wrong input format",
+                    "Please enter a valid floating point value (double)"
+                );
+                try {
+                    response = dialog.showAndWait().get();
+                    double ratingValue = Double.parseDouble(response);
+                    if(ratingValue >= 0.0 && ratingValue <= 5.0){
+                        rating.setRate(ratingValue);
+                    }
+                    else {
+                        wrongInputAlert.showAndWait();
+                        return;
+                    }
+                }
+                catch (NoSuchElementException nse){
+                    // User did not provide the rating
+                    return;
+                }
+                catch (NumberFormatException nfe) {
+                    wrongInputAlert.showAndWait();
+                    Logger.getLogger(MainWindowController.class.getName()).log(Level.WARNING, null, nfe);
+                    return;
+                }
+                // Insert new user rating or update if already exists
+                RatingDao ratingDao = new RatingDao();
+                if(!ratingDao.updateRating(rating)){
+                    ratingDao.insert(rating);
+                }
+                // Update affected station row
+                Station stationUpdated = new StationDao().getById(station.getId());
+                MainWindowController.this.stations.set(
+                        MainWindowController.this.stations.indexOf(station),
+                        stationUpdated
+                );
+                MainWindowController.this.tableView.getSelectionModel().select(stationUpdated);
+            }
+        });
+        
         contextMenu.getItems().get(2).setOnAction(new EventHandler<ActionEvent>() {
+            @Override
             public void handle(ActionEvent e) {
                 Station station = tableView.getSelectionModel().getSelectedItem();
                 MainWindowController.this.stations.remove(station);

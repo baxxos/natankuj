@@ -24,5 +24,6 @@
     <mapping class="dbsdemo.entities.Station" />
     <mapping class="dbsdemo.entities.StationBrand" />
     <mapping class="dbsdemo.entities.City" />
+    <mapping class="dbsdemo.entities.Rating" />
   </session-factory>
 </hibernate-configuration>

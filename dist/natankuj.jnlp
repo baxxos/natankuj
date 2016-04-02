@@ -31,7 +31,7 @@
     <jar href="lib/postgresql-9.2-1002.jdbc4.jar" size="576248" download="eager" />
     <jar href="lib/slf4j-api-1.6.1.jar" size="25734" download="eager" />
     <jar href="lib/slf4j-simple-1.6.1.jar" size="7741" download="eager" />
-    <jar href="natankuj.jar" size="50518" download="eager" />
+    <jar href="natankuj.jar" size="55951" download="eager" />
   </resources>
   <applet-desc  width="800" height="600" main-class="com.javafx.main.NoJavaFXFallback"  name="natankuj" >
     <param name="requiredFXVersion" value="8.0+"/>

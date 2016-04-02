@@ -1,11 +1,14 @@
 package dbsdemo.entities;
 
 import java.io.Serializable;
+import java.util.List;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 /**
@@ -26,6 +29,8 @@ public class User implements Serializable {
     private int userLevel;
     @Column
     private String passwd;
+    @OneToMany(mappedBy="user", cascade=CascadeType.REMOVE)
+    private List<Rating> ratings;
     
     @Id
     @GeneratedValue(strategy=GenerationType.AUTO)
@@ -97,5 +102,13 @@ public class User implements Serializable {
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    public List<Rating> getRatings() {
+        return ratings;
+    }
+
+    public void setRatings(List<Rating> ratings) {
+        this.ratings = ratings;
     }
 }

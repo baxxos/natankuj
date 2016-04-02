@@ -1,13 +1,18 @@
 package dbsdemo.entities;
 
+import dbsdemo.sql.custom.RatingDao;
 import java.io.Serializable;
+import java.util.List;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 /**
@@ -26,6 +31,8 @@ public class Station implements Serializable {
     @ManyToOne
     @JoinColumn(name="brand_id", nullable=false)
     private StationBrand brand;
+    @OneToMany(mappedBy="station", fetch = FetchType.EAGER, cascade=CascadeType.REMOVE)
+    private List<Rating> ratings;
     
     @Id
     @GeneratedValue(strategy=GenerationType.AUTO)
@@ -76,5 +83,17 @@ public class Station implements Serializable {
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    /*public List<Rating> getRatings() {
+        return ratings;
+    }*/
+    
+    public Double getRatings(){
+        return new RatingDao().getAverage(this);
+    }
+
+    public void setRatings(List<Rating> ratings) {
+        this.ratings = ratings;
     }
 }
