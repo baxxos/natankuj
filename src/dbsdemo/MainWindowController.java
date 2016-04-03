@@ -84,6 +84,8 @@ public class MainWindowController implements Initializable {
     private Button updateButton;
     @FXML
     private Button dropCreateButton;
+    @FXML
+    private Button cancelFilterButton;
     // Combo Boxes
     @FXML
     private ComboBox<String> brandsComboBox;
@@ -93,6 +95,8 @@ public class MainWindowController implements Initializable {
     private ComboBox<String> actionComboBox;
     @FXML
     private ComboBox<String> actionTargetComboBox;
+    @FXML
+    private ComboBox<String> ratingComboBox;
     // Misc GUI components
     @FXML
     private Label userNameLabel;
@@ -105,11 +109,17 @@ public class MainWindowController implements Initializable {
     private ObservableList<Station> stations;
     private final ObservableList<String> actions = FXCollections.observableArrayList();
     private final ObservableList<String> actionTargets = FXCollections.observableArrayList();
+    @FXML
+    private Font x2;
     
     public void populateComboBoxes(){
         
         this.brands = FXCollections.observableArrayList(new StationBrandsDao().getStationBrandsString());
         this.cities = FXCollections.observableArrayList(new CityDao().getCitiesAsString());
+        // Station ratings from 0.0 to 5.0
+        for(double i = 0.0; i<5.0; i++){
+            this.ratingComboBox.getItems().add("<"+i+"-"+(i+1)+">");
+        }
         
         this.actionComboBox.setItems(this.actions);
         this.actionTargetComboBox.setItems(this.actionTargets);
@@ -167,9 +177,9 @@ public class MainWindowController implements Initializable {
                 rating.setUser(activeUser);
                 
                 TextInputDialog dialog = new TextInputDialog("5.0");
-                dialog.setContentText("Content text");
-                dialog.setHeaderText("Header text");
-                dialog.setTitle("Title");
+                dialog.setContentText("Vaše hodnotenie:");
+                dialog.setHeaderText("Prosím, zvoľte hodnotu medzi 0.0-5.0");
+                dialog.setTitle("Hodnotenie čerpacej stanice");
                 
                 String response;
                 CustomAlert wrongInputAlert = new CustomAlert(
@@ -270,6 +280,16 @@ public class MainWindowController implements Initializable {
     @FXML
     private void filterButtonAction(ActionEvent event) throws IOException {
         
+        String brandFilter = this.brandsComboBox.getValue();
+        String cityFilter = this.cityComboBox.getValue();
+        
+        this.stations.setAll(new StationDao().getByAttributes(
+            brandFilter == null ? -1 : new StationBrandsDao().getStationBrand(brandFilter).get(0).getId(),
+            cityFilter == null ? -1 : new CityDao().getCity(cityFilter).get(0).getId(),
+            this.ratingComboBox.getSelectionModel().getSelectedIndex()
+        ));
+        
+        this.tabPaneMain.getSelectionModel().select(1);
     }
     
     @FXML
@@ -368,7 +388,16 @@ public class MainWindowController implements Initializable {
         }
     }
     
+    @FXML
+    private void cancelFilter(ActionEvent event) {
+        
+        this.brandsComboBox.valueProperty().set(null);
+        this.cityComboBox.valueProperty().set(null);
+        this.ratingComboBox.valueProperty().set(null);
+        this.populateTable();
+    }
+    
     public User getActiveUser() {
         return activeUser;
-    }
+    } 
 }

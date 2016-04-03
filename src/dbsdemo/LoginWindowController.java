@@ -115,7 +115,7 @@ public class LoginWindowController implements Initializable {
             User activeUser = new UserDao().getUser(
                     userNameTextField.getText(),
                     new SHA().getHash(passwdTextField.getText())
-            ).get(0);
+            );
             
             goToMainWindowScene(activeUser);
             this.actStage.close();

@@ -37,18 +37,18 @@ public class UserDao extends GenericDao<User> {
         session.close();
     }
        
-    public List<User> getUser(String userName, String passwd){
+    public User getUser(String userName, String passwd){
         
         sf = HibernateUtil.getSessionFactory();
         Session session = sf.openSession();
         String select = "SELECT * FROM users WHERE userName =:userName AND passwd =:passwd";
         SQLQuery query = session.createSQLQuery(select);
         
-        List<User> result = query
+        User result = (User) query
                 .addEntity(User.class)
                 .setParameter("userName", userName)
                 .setParameter("passwd", passwd)
-                .list();
+                .uniqueResult();
         
         session.close();
         return result;
