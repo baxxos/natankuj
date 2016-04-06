@@ -3,12 +3,9 @@ package dbsdemo.sql.custom;
 import dbsdemo.sql.GenericDao;
 import dbsdemo.sql.HibernateUtil;
 import dbsdemo.entities.StationBrand;
-import java.util.ArrayList;
 import java.util.List;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.hibernate.Transaction;
 
 /**
  *

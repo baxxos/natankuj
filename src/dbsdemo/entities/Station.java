@@ -26,13 +26,19 @@ public class Station implements Serializable {
     @ManyToOne
     @JoinColumn(name="city_id", nullable=false)
     private City city;
+    
     @Column(length=150)
     private String location;
+    
     @ManyToOne
     @JoinColumn(name="brand_id", nullable=false)
     private StationBrand brand;
+    
     @OneToMany(mappedBy="station", fetch = FetchType.EAGER, cascade=CascadeType.REMOVE)
     private List<Rating> ratings;
+    
+    @OneToMany(mappedBy="station", fetch = FetchType.EAGER, cascade=CascadeType.REMOVE)
+    private List<Offer> offers;
     
     @Id
     @GeneratedValue(strategy=GenerationType.AUTO)
@@ -84,10 +90,6 @@ public class Station implements Serializable {
     public void setId(int id) {
         this.id = id;
     }
-
-    /*public List<Rating> getRatings() {
-        return ratings;
-    }*/
     
     public Double getRatings(){
         return new RatingDao().getAverage(this);
@@ -95,5 +97,13 @@ public class Station implements Serializable {
 
     public void setRatings(List<Rating> ratings) {
         this.ratings = ratings;
+    }
+
+    public List<Offer> getOffers() {
+        return offers;
+    }
+
+    public void setOffers(List<Offer> offers) {
+        this.offers = offers;
     }
 }

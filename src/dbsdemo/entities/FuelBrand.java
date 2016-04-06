@@ -1,11 +1,14 @@
 package dbsdemo.entities;
 
 import java.io.Serializable;
+import java.util.List;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 /**
@@ -16,10 +19,13 @@ import javax.persistence.Table;
 @Table(name="fuel_brands")
 public class FuelBrand implements Serializable {
     
-    @Column(name="fuel_brand")
+    @Column(name="fuel_brand", unique=true, length=50)
     private String brand;
     @Column
     private String description;
+    @OneToMany(mappedBy="brand", cascade=CascadeType.REMOVE)
+    private List<Fuel> fuels;
+    
     @Id
     @GeneratedValue(strategy=GenerationType.AUTO)
     private int id;
@@ -37,7 +43,7 @@ public class FuelBrand implements Serializable {
         this.brand = brand;
         this.description = description;
     }
-    
+
     public String getBrand() {
         return brand;
     }
@@ -52,6 +58,14 @@ public class FuelBrand implements Serializable {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public List<Fuel> getFuels() {
+        return fuels;
+    }
+
+    public void setFuels(List<Fuel> fuels) {
+        this.fuels = fuels;
     }
 
     public int getId() {

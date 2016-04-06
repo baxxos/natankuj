@@ -3,7 +3,6 @@ package dbsdemo.sql.custom;
 import dbsdemo.entities.User;
 import dbsdemo.sql.GenericDao;
 import dbsdemo.sql.HibernateUtil;
-import java.util.List;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.Transaction;

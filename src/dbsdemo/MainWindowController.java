@@ -128,6 +128,7 @@ public class MainWindowController implements Initializable {
     }
     
     public void populateTable(){
+        
         this.stations = FXCollections.observableArrayList(new StationDao().getAllAsObjects());
 
         colBrand.setCellValueFactory(

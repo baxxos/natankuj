@@ -1,7 +1,6 @@
 package dbsdemo.sql.custom;
 
 import dbsdemo.entities.City;
-import dbsdemo.entities.StationBrand;
 import dbsdemo.sql.GenericDao;
 import dbsdemo.sql.HibernateUtil;
 import java.util.List;

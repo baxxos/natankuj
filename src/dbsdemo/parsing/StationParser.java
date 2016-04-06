@@ -138,7 +138,7 @@ public class StationParser {
             prices.set(i, prices.get(i).replace(",", "."));
             addressFromTitle.set(i, addressFromTitle.get(i).replace(brands.get(i) + " ", ""));
 
-            //odfiltrujeme chybne zapisane znacky - napr. "Benzinol S..."
+            // Odfiltrujeme chybne zapisane znacky - napr. "Benzinol S..."
             if (!brands.get(i).contains("...")) {
 
                 String city = addressFromTitle.get(i).substring(0, addressFromTitle.get(i).indexOf(",")).trim();

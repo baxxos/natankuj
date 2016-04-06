@@ -2,12 +2,10 @@ package dbsdemo.sql.custom;
 
 import dbsdemo.sql.GenericDao;
 import dbsdemo.entities.Station;
-import dbsdemo.entities.User;
 import dbsdemo.sql.HibernateUtil;
 import java.util.List;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
-import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 
 /**

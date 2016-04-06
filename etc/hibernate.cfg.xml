@@ -25,5 +25,9 @@
     <mapping class="dbsdemo.entities.StationBrand" />
     <mapping class="dbsdemo.entities.City" />
     <mapping class="dbsdemo.entities.Rating" />
+    <mapping class="dbsdemo.entities.Offer" />
+    <mapping class="dbsdemo.entities.Fuel" />
+    <mapping class="dbsdemo.entities.FuelType" />
+    <mapping class="dbsdemo.entities.FuelBrand" />
   </session-factory>
 </hibernate-configuration>

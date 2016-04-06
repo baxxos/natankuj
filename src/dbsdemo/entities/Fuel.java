@@ -1,11 +1,17 @@
 package dbsdemo.entities;
 
 import java.io.Serializable;
+import java.util.List;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 /**
@@ -16,10 +22,14 @@ import javax.persistence.Table;
 @Table(name="fuels")
 public class Fuel implements Serializable {
     
-    @Column
-    private String fuelType;
-    @Column
-    private String fuelName;
+    @ManyToOne
+    @JoinColumn(name="fuel_brand_id")
+    private FuelBrand brand;
+    @ManyToOne
+    @JoinColumn(name="fuel_type_id")
+    private FuelType type;
+    @OneToMany(mappedBy="fuel", fetch = FetchType.EAGER, cascade=CascadeType.REMOVE)
+    private List<Offer> offers;
     
     @Id
     @GeneratedValue(strategy=GenerationType.AUTO)
@@ -28,27 +38,21 @@ public class Fuel implements Serializable {
     public Fuel(){
         // For ORM purposes
     }
-    
-    public Fuel(String fuelType, String fuelName){
-        
-        this.fuelType = fuelType;
-        this.fuelName = fuelName;
+
+    public FuelBrand getBrand() {
+        return brand;
     }
 
-    public String getFuelType() {
-        return fuelType;
+    public void setBrand(FuelBrand brand) {
+        this.brand = brand;
     }
 
-    public void setFuelType(String fuelType) {
-        this.fuelType = fuelType;
+    public FuelType getType() {
+        return type;
     }
 
-    public String getFuelName() {
-        return fuelName;
-    }
-
-    public void setFuelName(String fuelName) {
-        this.fuelName = fuelName;
+    public void setType(FuelType type) {
+        this.type = type;
     }
 
     public int getId() {
@@ -57,5 +61,13 @@ public class Fuel implements Serializable {
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    public List<Offer> getOffers() {
+        return offers;
+    }
+
+    public void setOffers(List<Offer> offers) {
+        this.offers = offers;
     }
 }
