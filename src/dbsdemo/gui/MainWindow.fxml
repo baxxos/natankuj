@@ -70,7 +70,7 @@
                       </items>
                     </ComboBox>
                     <Label layoutX="16.0" layoutY="194.0" text="Typ paliva" />
-                    <ComboBox layoutX="17.0" layoutY="217.0" minWidth="160.0" prefWidth="-1.0" promptText="-">
+                    <ComboBox fx:id="fuelTypeComboBox" layoutX="17.0" layoutY="217.0" minWidth="160.0" prefWidth="-1.0" promptText="-">
                       <items>
                         <FXCollections fx:factory="observableArrayList">
                           <String fx:value="Item 1" />
@@ -170,9 +170,9 @@
                                   <columns>
                                     <TableColumn maxWidth="5000.0" minWidth="10.0" prefWidth="100.0" text="Značka ČS" fx:id="colBrand" />
                                     <TableColumn maxWidth="5000.0" minWidth="10.0" prefWidth="150.0" text="Mesto" fx:id="colCity" />
-                                    <TableColumn maxWidth="5000.0" minWidth="10.0" prefWidth="150.0" text="Lokalita" fx:id="colLocation" />
+                                    <TableColumn maxWidth="5000.0" minWidth="10.0" prefWidth="200.0" text="Lokalita" fx:id="colLocation" />
                                     <TableColumn prefWidth="100.0" text="Hodnotenie" fx:id="colRating" />
-                                    <TableColumn prefWidth="100.0" text="Palivo" fx:id="colFuelName" />
+                                    <TableColumn prefWidth="50.0" text="Palivo" fx:id="colFuelName" />
                                     <TableColumn prefWidth="100.0" text="Cena" fx:id="colPrice" />
                                     <TableColumn prefWidth="100.0" text="Dátum" fx:id="colDate" />
                                   </columns>

@@ -10,6 +10,7 @@ import dbsdemo.parsing.StationParser;
 import dbsdemo.entities.Station;
 import dbsdemo.entities.StationBrand;
 import dbsdemo.sql.custom.CityDao;
+import dbsdemo.sql.custom.FuelTypeDao;
 import dbsdemo.sql.custom.RatingDao;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -34,8 +35,11 @@ public class DatabaseControl {
             CityDao cityDao = new CityDao();
             StationDao stationDao = new StationDao();
             StationBrandsDao brandsDao = new StationBrandsDao();
+            FuelTypeDao fuelTypeDao = new FuelTypeDao();
             
             new RatingDao().eraseTable();
+            fuelTypeDao.eraseTable();
+            fuelTypeDao.insertDefault();
             
             ArrayList<City> cities = new ArrayList<>(parser.parseCities(url, true));
             cityDao.eraseTable();

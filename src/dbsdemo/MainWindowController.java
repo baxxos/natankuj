@@ -1,5 +1,6 @@
 package dbsdemo;
 
+import dbsdemo.entities.Offer;
 import dbsdemo.entities.Rating;
 import dbsdemo.entities.User;
 import dbsdemo.sql.DatabaseControl;
@@ -10,6 +11,8 @@ import dbsdemo.misc.CustomAlert;
 import dbsdemo.misc.PropLoader;
 import dbsdemo.sql.HibernateUtil;
 import dbsdemo.sql.custom.CityDao;
+import dbsdemo.sql.custom.FuelTypeDao;
+import dbsdemo.sql.custom.OfferDao;
 import dbsdemo.sql.custom.RatingDao;
 import dbsdemo.sql.custom.UserDao;
 import java.io.IOException;
@@ -57,7 +60,7 @@ import org.hibernate.SessionFactory;
 public class MainWindowController implements Initializable {
     // Table related components
     @FXML
-    private TableView<Station> tableView;
+    private TableView<Offer> tableView;
     private TableView<User> tableViewUsers;
     @FXML
     private TabPane tabPaneMain;
@@ -70,7 +73,7 @@ public class MainWindowController implements Initializable {
     @FXML
     private TableColumn<Station, Double> colRating;
     @FXML
-    private TableColumn<?, ?> colFuelName;
+    private TableColumn<Station, String> colFuelName;
     @FXML
     private TableColumn<?, ?> colPrice;
     @FXML
@@ -97,6 +100,8 @@ public class MainWindowController implements Initializable {
     private ComboBox<String> actionTargetComboBox;
     @FXML
     private ComboBox<String> ratingComboBox;
+    @FXML
+    private ComboBox<String> fuelTypeComboBox;
     // Misc GUI components
     @FXML
     private Label userNameLabel;
@@ -106,7 +111,7 @@ public class MainWindowController implements Initializable {
     private User activeUser;
     private ObservableList<String> brands;
     private ObservableList<String> cities;
-    private ObservableList<Station> stations;
+    private ObservableList<Offer> offers;
     private final ObservableList<String> actions = FXCollections.observableArrayList();
     private final ObservableList<String> actionTargets = FXCollections.observableArrayList();
     @FXML
@@ -120,6 +125,10 @@ public class MainWindowController implements Initializable {
         for(double i = 0.0; i<5.0; i++){
             this.ratingComboBox.getItems().add("<"+i+"-"+(i+1)+">");
         }
+        // Fuel types
+        this.fuelTypeComboBox.setItems(
+                FXCollections.observableArrayList(new FuelTypeDao().getTypesAsString())
+        );
         
         this.actionComboBox.setItems(this.actions);
         this.actionTargetComboBox.setItems(this.actionTargets);
@@ -129,7 +138,7 @@ public class MainWindowController implements Initializable {
     
     public void populateTable(){
         
-        this.stations = FXCollections.observableArrayList(new StationDao().getAllAsObjects());
+        this.offers = FXCollections.observableArrayList(new OfferDao().getAllAsObjects());
 
         colBrand.setCellValueFactory(
             new PropertyValueFactory<>("brand")
@@ -143,7 +152,10 @@ public class MainWindowController implements Initializable {
         colRating.setCellValueFactory(
             new PropertyValueFactory<>("ratings")
         );
-        this.tableView.setItems(stations);
+        colFuelName.setCellValueFactory(
+            new PropertyValueFactory<>("fuelType")
+        );
+        this.tableView.setItems(offers);
     }
     
     private void addContextMenu(Region region){
@@ -152,7 +164,7 @@ public class MainWindowController implements Initializable {
         contextMenu.getItems().add(new MenuItem("Ohodnotiť stanicu"));
         contextMenu.getItems().add(new MenuItem("Aktualizovať cenu")); 
         // Restrict low level users from deleting records
-        MenuItem recDeletion = new MenuItem("Vymazať záznam");
+        MenuItem recDeletion = new MenuItem("Vymazať stanicu a súvisiace záznamy");
         recDeletion.setDisable(this.activeUser.getUserLevel() < 2);
         contextMenu.getItems().add(recDeletion);
 
@@ -171,10 +183,11 @@ public class MainWindowController implements Initializable {
         contextMenu.getItems().get(0).setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent e) {
-                Station station = tableView.getSelectionModel().getSelectedItem();
+                
+                Offer offer = tableView.getSelectionModel().getSelectedItem();
                 
                 Rating rating = new Rating();
-                rating.setStation(station);
+                rating.setStation(offer.getStation());
                 rating.setUser(activeUser);
                 
                 TextInputDialog dialog = new TextInputDialog("5.0");
@@ -214,21 +227,24 @@ public class MainWindowController implements Initializable {
                 if(!ratingDao.updateRating(rating)){
                     ratingDao.insert(rating);
                 }
-                // Update affected station row
-                Station stationUpdated = new StationDao().getById(station.getId());
-                MainWindowController.this.stations.set(
-                        MainWindowController.this.stations.indexOf(station),
-                        stationUpdated
+                // Update affected station row                
+                MainWindowController.this.offers.set(
+                        MainWindowController.this.offers.indexOf(offer),
+                        offer
                 );
-                MainWindowController.this.tableView.getSelectionModel().select(stationUpdated);
+                MainWindowController.this.tableView.getSelectionModel().select(offer);
             }
         });
         
         contextMenu.getItems().get(2).setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent e) {
-                Station station = tableView.getSelectionModel().getSelectedItem();
-                MainWindowController.this.stations.remove(station);
+                Station station = tableView.getSelectionModel().getSelectedItem().getStation();
+                
+                for(Offer offer : MainWindowController.this.offers){
+                    if(offer.getStation().getId() == station.getId())
+                        MainWindowController.this.offers.remove(offer);
+                }
                 new StationDao().deleteRecord(station.getId());
             }
         });
@@ -270,9 +286,15 @@ public class MainWindowController implements Initializable {
                 new EventHandler<TableColumn.CellEditEvent<Station, String>>() {
                     @Override
                     public void handle(TableColumn.CellEditEvent<Station, String> t) {
-                        Station station = tableView.getSelectionModel().getSelectedItem();
+                        
+                        Offer offer = tableView.getSelectionModel().getSelectedItem();
+                        Station station = offer.getStation();
                         station.setLocation(t.getNewValue());
                         new StationDao().updateStation(station);
+                        MainWindowController.this.offers.set(
+                                MainWindowController.this.offers.indexOf(offer),
+                                offer
+                        );
                     }
                 }
         );
@@ -283,10 +305,12 @@ public class MainWindowController implements Initializable {
         
         String brandFilter = this.brandsComboBox.getValue();
         String cityFilter = this.cityComboBox.getValue();
+        String fuelTypeFilter = this.fuelTypeComboBox.getValue();
         
-        this.stations.setAll(new StationDao().getByAttributes(
+        this.offers.setAll(new OfferDao().getByAttributes(
             brandFilter == null ? -1 : new StationBrandsDao().getStationBrand(brandFilter).get(0).getId(),
             cityFilter == null ? -1 : new CityDao().getCity(cityFilter).get(0).getId(),
+            fuelTypeFilter == null ? -1 : new FuelTypeDao().getFuelType(fuelTypeFilter).getId(),
             this.ratingComboBox.getSelectionModel().getSelectedIndex()
         ));
         
@@ -395,6 +419,7 @@ public class MainWindowController implements Initializable {
         this.brandsComboBox.valueProperty().set(null);
         this.cityComboBox.valueProperty().set(null);
         this.ratingComboBox.valueProperty().set(null);
+        this.fuelTypeComboBox.valueProperty().set(null);
         this.populateTable();
     }
     

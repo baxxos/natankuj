@@ -26,3 +26,11 @@ WHERE station_id = 4202;
 SELECT DISTINCT  s.id, location, brand_id, city_id FROM ratings r
 JOIN stations s ON r.station_id = s.id
 WHERE r.rate > X
+
+//full najoinovanie tabuliek to viewu
+SELECT s.id, s.location, sb.brand, ft.fuel_type, fb.fuel_brand, fb.description FROM stations s
+FULL OUTER JOIN station_brands sb ON s.brand_id = sb.id
+FULL JOIN offers o ON o.station_id = s.id
+FULL JOIN fuels f ON o.fuel_id = f.id
+FULL JOIN fuel_types ft ON f.fuel_type_id = ft.id
+FULL JOIN fuel_brands fb ON f.fuel_brand_id = fb.id

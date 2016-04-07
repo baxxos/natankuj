@@ -31,4 +31,48 @@ public class Offer implements Serializable {
     public Offer(){
         // For ORM purposes
     }
+
+    public Station getStation() {
+        return station;
+    }
+
+    public void setStation(Station station) {
+        this.station = station;
+    }
+    
+    public String getBrand(){
+        return this.station.getBrand().getBrand();
+    }
+    
+    public String getLocation(){
+        return this.station.getLocation();
+    }
+    
+    public String getCity(){
+        return this.station.getCity().getName();
+    }
+    
+    public Double getRatings(){
+        return this.station.getRatings();
+    }
+    
+    public Fuel getFuel() {
+        return fuel;
+    }
+
+    public void setFuel(Fuel fuel) {
+        this.fuel = fuel;
+    }
+    
+    public String getFuelType(){
+        return this.fuel.getType().getType();
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
 }
