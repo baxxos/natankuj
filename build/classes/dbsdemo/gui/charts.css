@@ -1,0 +1,29 @@
+#chartGasoline .chart-plot-background {
+    -fx-background-color: #e2ecfe;
+}
+#chartGasoline .chart-vertical-grid-lines {
+    -fx-stroke: #3278fa;
+}
+#chartGasoline .chart-horizontal-grid-lines {
+    -fx-stroke: #3278fa;
+}
+#chartGasoline .chart-alternative-row-fill {
+    -fx-fill: #99bcfd;
+    -fx-stroke: transparent;
+    -fx-stroke-width: 0;
+}
+
+#chartDiesel .chart-plot-background {
+    -fx-background-color: #e2ecfe;
+}
+#chartDiesel .chart-vertical-grid-lines {
+    -fx-stroke: #3278fa;
+}
+#chartDiesel .chart-horizontal-grid-lines {
+    -fx-stroke: #3278fa;
+}
+#chartDiesel .chart-alternative-row-fill {
+    -fx-fill: #99bcfd;
+    -fx-stroke: transparent;
+    -fx-stroke-width: 0;
+}

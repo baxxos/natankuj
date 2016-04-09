@@ -24,7 +24,7 @@ public class FuelTypeDao extends GenericDao<FuelType> {
         sf = HibernateUtil.getSessionFactory();
         Session session = sf.openSession();
         Transaction t = session.beginTransaction();
-        String sql = "INSERT INTO fuel_types() VALUES "
+        String sql = "INSERT INTO fuel_types(fuel_type) VALUES "
                 + "('Diesel'), "
                 + "('NAT 95'), "
                 + "('NAT 98');";
@@ -51,9 +51,13 @@ public class FuelTypeDao extends GenericDao<FuelType> {
 
     public FuelType getFuelType(String fuel_type) {
         
+        fuel_type = (fuel_type.contains("95") ? "NAT 95" : fuel_type);
+        fuel_type = (fuel_type.contains("98") ? "NAT 98" : fuel_type);
+        fuel_type = (fuel_type.contains("Diesel") || fuel_type.contains("Nafta") ? "Diesel" : fuel_type);
+        
         sf = HibernateUtil.getSessionFactory();
         Session session = sf.openSession();
-        String select = "SELECT * FROM fuel_types WHERE fuel_type =:fuel_type";
+        String select = "SELECT DISTINCT * FROM fuel_types WHERE fuel_type =:fuel_type";
         SQLQuery query = session.createSQLQuery(select);
         
         FuelType result = (FuelType) query

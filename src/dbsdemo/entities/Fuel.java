@@ -38,7 +38,12 @@ public class Fuel implements Serializable {
     public Fuel(){
         // For ORM purposes
     }
-
+    
+    public Fuel(FuelBrand brand, FuelType type){
+        this.brand = brand;
+        this.type = type;
+    }
+    
     public FuelBrand getBrand() {
         return brand;
     }

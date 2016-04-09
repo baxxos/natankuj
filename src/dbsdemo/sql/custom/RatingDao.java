@@ -23,7 +23,9 @@ public class RatingDao extends GenericDao {
         sf = HibernateUtil.getSessionFactory();
         Session session = sf.openSession();
         Transaction t = session.beginTransaction();
-        String select = "UPDATE ratings SET rate =:rate WHERE user_id =:user_id AND station_id =:station_id";
+        String select = "UPDATE ratings SET rate =:rate "
+                + "WHERE user_id =:user_id "
+                + "AND station_id =:station_id";
         SQLQuery query = session.createSQLQuery(select);
         
         int affectedRows = query
@@ -41,18 +43,23 @@ public class RatingDao extends GenericDao {
 
         sf = HibernateUtil.getSessionFactory();
         Session session = sf.openSession();
-        String select = "SELECT avg(rate) FROM ratings r JOIN stations s ON r.station_id = s.id WHERE station_id =:station_id";
+        String select = "SELECT CAST(round(CAST(average AS numeric), 1) AS double precision) FROM "
+                + "(SELECT avg(rate) as average FROM ratings r "
+                + "JOIN stations s ON r.station_id = s.id "
+                + "WHERE station_id =:station_id) sub";
         SQLQuery query = session.createSQLQuery(select);
         
         double result;
         try {
-            result = (double) query.setParameter("station_id", station.getId()).uniqueResult();
+            result = (double) query
+                    .setParameter("station_id", station.getId())
+                    .uniqueResult();
         }
         catch (NullPointerException e){
             // No ratings available for the station
             result = 0.0;
         }
         session.close();
-        return  (double) Math.round(result*10)/10;
+        return  result;
     }
 }

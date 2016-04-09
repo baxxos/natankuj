@@ -1,5 +1,6 @@
 package dbsdemo.sql;
 
+import dbsdemo.entities.Offer;
 import dbsdemo.entities.User;
 import java.util.List;
 import javax.persistence.Table;
@@ -42,7 +43,10 @@ public class GenericDao<T> implements GenericDaoMethods<T> {
         
         int i = 0;
         for(T instance : entityList){
-            session.persist(instance);
+            if(instance instanceof Offer)
+                session.saveOrUpdate(instance);
+            else
+                session.persist(instance);
             if(i%50 == 0) {
                 // Flush a batch of inserts and release memory
                 session.flush();

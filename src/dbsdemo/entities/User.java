@@ -31,6 +31,8 @@ public class User implements Serializable {
     private String passwd;
     @OneToMany(mappedBy="user", cascade=CascadeType.REMOVE)
     private List<Rating> ratings;
+    @OneToMany(mappedBy="user", cascade=CascadeType.REMOVE)
+    private List<Price> prices;
     
     @Id
     @GeneratedValue(strategy=GenerationType.AUTO)

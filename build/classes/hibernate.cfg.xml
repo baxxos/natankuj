@@ -29,5 +29,6 @@
     <mapping class="dbsdemo.entities.Fuel" />
     <mapping class="dbsdemo.entities.FuelType" />
     <mapping class="dbsdemo.entities.FuelBrand" />
+    <mapping class="dbsdemo.entities.Price" />
   </session-factory>
 </hibernate-configuration>

@@ -17,17 +17,17 @@ public class CityDao extends GenericDao<City> {
         super(City.class);
     }
     
-    public List<City> getCity(String name){
+    public City getCity(String name){
         
         sf = HibernateUtil.getSessionFactory();
         Session session = sf.openSession();
-        String select = "SELECT * FROM cities WHERE name =:name";
+        String select = "SELECT DISTINCT * FROM cities WHERE name =:name";
         SQLQuery query = session.createSQLQuery(select);
         
-        List<City> result = query
+        City result = (City) query
                 .addEntity(City.class)
                 .setParameter("name", name)
-                .list();
+                .uniqueResult();
         
         session.close();
         return result;

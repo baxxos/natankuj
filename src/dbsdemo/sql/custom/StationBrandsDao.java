@@ -30,17 +30,17 @@ public class StationBrandsDao extends GenericDao<StationBrand>{
         return result;
     }
     
-    public List<StationBrand> getStationBrand(String brand){
+    public StationBrand getStationBrand(String brand){
         
         sf = HibernateUtil.getSessionFactory();
         Session session = sf.openSession();
-        String select = "SELECT * FROM station_brands WHERE brand =:brand";
+        String select = "SELECT DISTINCT * FROM station_brands WHERE brand =:brand";
         SQLQuery query = session.createSQLQuery(select);
         
-        List<StationBrand> result = query
+        StationBrand result = (StationBrand) query
                 .addEntity(StationBrand.class)
                 .setParameter("brand", brand)
-                .list();
+                .uniqueResult();
         
         session.close();
         return result;

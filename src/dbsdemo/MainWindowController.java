@@ -1,6 +1,7 @@
 package dbsdemo;
 
 import dbsdemo.entities.Offer;
+import dbsdemo.entities.Price;
 import dbsdemo.entities.Rating;
 import dbsdemo.entities.User;
 import dbsdemo.sql.DatabaseControl;
@@ -12,14 +13,19 @@ import dbsdemo.misc.PropLoader;
 import dbsdemo.sql.HibernateUtil;
 import dbsdemo.sql.custom.CityDao;
 import dbsdemo.sql.custom.FuelTypeDao;
+import dbsdemo.sql.custom.MonthlyAverage;
 import dbsdemo.sql.custom.OfferDao;
+import dbsdemo.sql.custom.PriceDao;
 import dbsdemo.sql.custom.RatingDao;
-import dbsdemo.sql.custom.UserDao;
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Properties;
 import java.util.ResourceBundle;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.collections.FXCollections;
@@ -29,8 +35,12 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.geometry.Point2D;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.chart.LineChart;
+import javafx.scene.chart.XYChart;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
@@ -49,8 +59,6 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Region;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
 
 /**
  * FXML Controller class
@@ -75,9 +83,9 @@ public class MainWindowController implements Initializable {
     @FXML
     private TableColumn<Station, String> colFuelName;
     @FXML
-    private TableColumn<?, ?> colPrice;
+    private TableColumn<Station, Double> colPrice;
     @FXML
-    private TableColumn<?, ?> colDate;
+    private TableColumn<Station, String> colDate;
     // Button GUI components
     @FXML
     private Button fireUserActionButton;
@@ -102,6 +110,13 @@ public class MainWindowController implements Initializable {
     private ComboBox<String> ratingComboBox;
     @FXML
     private ComboBox<String> fuelTypeComboBox;
+    @FXML
+    private TableColumn<Station, String> colFuelBrand;
+    // Charts
+    @FXML
+    private LineChart<?, ?> chartGasoline;
+    @FXML
+    private LineChart<?, ?> chartDiesel;
     // Misc GUI components
     @FXML
     private Label userNameLabel;
@@ -139,7 +154,7 @@ public class MainWindowController implements Initializable {
     public void populateTable(){
         
         this.offers = FXCollections.observableArrayList(new OfferDao().getAllAsObjects());
-
+        
         colBrand.setCellValueFactory(
             new PropertyValueFactory<>("brand")
         );
@@ -155,32 +170,111 @@ public class MainWindowController implements Initializable {
         colFuelName.setCellValueFactory(
             new PropertyValueFactory<>("fuelType")
         );
+        colFuelBrand.setCellValueFactory(
+            new PropertyValueFactory<>("fuelBrand")
+        );
+        colPrice.setCellValueFactory(
+            new PropertyValueFactory<>("price")
+        );
+        colDate.setCellValueFactory(
+            new PropertyValueFactory<>("date")
+        );
         this.tableView.setItems(offers);
+        //Tooltip.install(this.colFuelBrand, new Tooltip("Ahoj"));
+    }
+    
+    public void populateCharts(){
+        // Populate gasoline 95 monthly average prices via PriceDao
+        XYChart.Series gasolineSeries = new XYChart.Series();
+        List<MonthlyAverage> yearlyGasolineData = new PriceDao().getAvgMonthPrices(new FuelTypeDao().getFuelType("95"));
+        
+        for(MonthlyAverage month : yearlyGasolineData){
+            //System.out.println(month.getMonthName()+":"+month.getMonthAvg());
+            if(month.getMonthAvg() > 0.0){
+                gasolineSeries.getData().add(new XYChart.Data(month.getMonthName(), month.getMonthAvg()));
+            }
+        }
+        chartGasoline.getData().add(gasolineSeries);
+        // Populate diesel monthly average prices via PriceDao
+        XYChart.Series dieselSeries = new XYChart.Series();
+        List<MonthlyAverage> yearlyDieselData = new PriceDao().getAvgMonthPrices(new FuelTypeDao().getFuelType("Diesel"));
+        
+        for(MonthlyAverage month : yearlyDieselData){
+            //System.out.println(month.getMonthName()+":"+month.getMonthAvg());
+            if(month.getMonthAvg() > 0.0){
+                dieselSeries.getData().add(new XYChart.Data(month.getMonthName(), month.getMonthAvg()));
+            }
+        }
+        chartDiesel.getData().add(dieselSeries);
+        // Render charts empty if there is no price data
+        if(dieselSeries.getData().size() == 0){
+            dieselSeries.getData().add(new XYChart.Data("No records", 0.0));
+        }
+        if(gasolineSeries.getData().size() == 0){
+            gasolineSeries.getData().add(new XYChart.Data("No records", 0.0));
+        }
+        
+        // Modify chart styles
+        chartGasoline.setCreateSymbols(false);
+        Set<Node> lineNode = chartGasoline.lookupAll(".series0");  
+          for (final Node line : lineNode) {  
+               line.setStyle("-fx-stroke: #58B500;");  
+        }
+          
+        chartDiesel.setCreateSymbols(false);
+        lineNode = chartDiesel.lookupAll(".series0");  
+          for (final Node line : lineNode) {  
+               line.setStyle("-fx-stroke: #0077FF;");  
+        }
     }
     
     private void addContextMenu(Region region){
         
-        ContextMenu contextMenu = new ContextMenu();
-        contextMenu.getItems().add(new MenuItem("Ohodnotiť stanicu"));
-        contextMenu.getItems().add(new MenuItem("Aktualizovať cenu")); 
+        ContextMenu primaryMenu = new ContextMenu();
+        primaryMenu.getItems().add(new MenuItem("Ohodnotiť stanicu"));
+        primaryMenu.getItems().add(new MenuItem("Aktualizovať cenu")); 
         // Restrict low level users from deleting records
         MenuItem recDeletion = new MenuItem("Vymazať stanicu a súvisiace záznamy");
         recDeletion.setDisable(this.activeUser.getUserLevel() < 2);
-        contextMenu.getItems().add(recDeletion);
+        primaryMenu.getItems().add(recDeletion);
+        
+        ContextMenu secondaryMenu = new ContextMenu();
+        
+        region.addEventHandler(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent t) {
+                MenuItem fakeTooltip = new MenuItem(tableView.getSelectionModel().getSelectedItem().toString());
+                
+                final Scene scene = tableView.getScene();
+                final Point2D windowCoord = new Point2D(scene.getWindow().getX(), scene.getWindow().getY());
+                final Point2D sceneCoord = new Point2D(scene.getX(), scene.getY());
+                final Point2D nodeCoord = tableView.localToScene(0.0, 0.0);
+                final double clickX = Math.round(windowCoord.getX() + sceneCoord.getX() + nodeCoord.getX() + tableView.getWidth());
+                final double clickY = Math.round(windowCoord.getY() + sceneCoord.getY() + nodeCoord.getY());
+                       
+                if(t.getButton() == MouseButton.PRIMARY){
+                    secondaryMenu.getItems().setAll(fakeTooltip);
+                    secondaryMenu.show(tableView , clickX, clickY);
+                }
+                else {
+                    secondaryMenu.hide();
+                }
+            }
+        });
 
         region.addEventHandler(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent t) {
                 if(t.getButton() == MouseButton.SECONDARY){
-                    contextMenu.show(tableView , t.getScreenX() , t.getScreenY());
+                    primaryMenu.show(tableView , t.getScreenX() , t.getScreenY());
                 }
                 else {
-                    contextMenu.hide();
+                    primaryMenu.hide();
                 }
             }
         });
         
-        contextMenu.getItems().get(0).setOnAction(new EventHandler<ActionEvent>() {
+        primaryMenu.getItems().get(0).setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent e) {
                 
@@ -236,14 +330,67 @@ public class MainWindowController implements Initializable {
             }
         });
         
-        contextMenu.getItems().get(2).setOnAction(new EventHandler<ActionEvent>() {
+        primaryMenu.getItems().get(1).setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent e) {
+                Offer offer = tableView.getSelectionModel().getSelectedItem();
+                
+                Price price = new Price();
+                price.setOffer(offer);
+                price.setUser(activeUser);
+                
+                TextInputDialog dialog = new TextInputDialog("5.0");
+                dialog.setContentText("Zadajte novú cenu:");
+                dialog.setHeaderText("Prosím, zadajte desatinné číslo v tvare X.XXXX alebo kratšom");
+                dialog.setTitle("Aktualizácia ponuky čerpacej stanice");
+                
+                String response;
+                CustomAlert wrongInputAlert = new CustomAlert(
+                    Alert.AlertType.ERROR,
+                    "Error",
+                    "Wrong input format",
+                    "Please enter a valid floating point value (double)"
+                );
+                try {
+                    response = dialog.showAndWait().get();
+                    double priceValue = Double.parseDouble(response);
+                    if(priceValue > 0.0){
+                        price.setPrice(priceValue);
+                    }
+                    else {
+                        wrongInputAlert.showAndWait();
+                        return;
+                    }
+                }
+                catch (NoSuchElementException nse){
+                    // User did not provide the rating
+                    return;
+                }
+                catch (NumberFormatException nfe) {
+                    wrongInputAlert.showAndWait();
+                    Logger.getLogger(MainWindowController.class.getName()).log(Level.WARNING, null, nfe);
+                    return;
+                }
+                // Assign date and insert new price
+                price.setDate(Calendar.getInstance().getTime());
+                new PriceDao().insert(price);
+                // Update affected station row                
+                MainWindowController.this.offers.set(
+                        MainWindowController.this.offers.indexOf(offer),
+                        offer
+                );
+                MainWindowController.this.tableView.getSelectionModel().select(offer);
+            }
+        });
+        
+        primaryMenu.getItems().get(2).setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent e) {
                 Station station = tableView.getSelectionModel().getSelectedItem().getStation();
                 
-                for(Offer offer : MainWindowController.this.offers){
-                    if(offer.getStation().getId() == station.getId())
-                        MainWindowController.this.offers.remove(offer);
+                for(int i = MainWindowController.this.offers.size()-1; i>=0; i--){
+                    if(MainWindowController.this.offers.get(i).getStation().getId() == station.getId())
+                        MainWindowController.this.offers.remove(MainWindowController.this.offers.get(i));
                 }
                 new StationDao().deleteRecord(station.getId());
             }
@@ -271,6 +418,7 @@ public class MainWindowController implements Initializable {
         // Populate content in comboBoxes and tableViews
         this.populateTable();
         this.populateComboBoxes();
+        this.populateCharts();
         this.tabPaneMain.setTabClosingPolicy(TabClosingPolicy.ALL_TABS);
     }    
     
@@ -308,8 +456,8 @@ public class MainWindowController implements Initializable {
         String fuelTypeFilter = this.fuelTypeComboBox.getValue();
         
         this.offers.setAll(new OfferDao().getByAttributes(
-            brandFilter == null ? -1 : new StationBrandsDao().getStationBrand(brandFilter).get(0).getId(),
-            cityFilter == null ? -1 : new CityDao().getCity(cityFilter).get(0).getId(),
+            brandFilter == null ? -1 : new StationBrandsDao().getStationBrand(brandFilter).getId(),
+            cityFilter == null ? -1 : new CityDao().getCity(cityFilter).getId(),
             fuelTypeFilter == null ? -1 : new FuelTypeDao().getFuelType(fuelTypeFilter).getId(),
             this.ratingComboBox.getSelectionModel().getSelectedIndex()
         ));
@@ -322,11 +470,18 @@ public class MainWindowController implements Initializable {
     }
 
     @FXML
-    private void dropCreateDatabase(ActionEvent event) {
+    private void dropCreateDatabase(ActionEvent event) throws InterruptedException {
         
-        DatabaseControl.recreateTables();
-        this.populateComboBoxes();
-        this.populateTable();
+        new Thread(){
+            @Override
+            public void run(){
+                HibernateUtil.getSessionFactory().openSession();
+                DatabaseControl.recreateTables();
+                MainWindowController.this.populateComboBoxes();
+                MainWindowController.this.populateTable();
+            }
+        }.start();
+        
     }
     
     @FXML
