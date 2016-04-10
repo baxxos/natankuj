@@ -1,5 +1,6 @@
 package dbsdemo.sql.custom;
 
+import dbsdemo.entities.FuelType;
 import dbsdemo.entities.Offer;
 import dbsdemo.entities.Station;
 import dbsdemo.sql.GenericDao;

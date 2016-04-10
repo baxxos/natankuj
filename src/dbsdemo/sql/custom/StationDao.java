@@ -1,10 +1,12 @@
 package dbsdemo.sql.custom;
 
 import dbsdemo.entities.City;
+import dbsdemo.entities.Price;
 import dbsdemo.sql.GenericDao;
 import dbsdemo.entities.Station;
 import dbsdemo.entities.StationBrand;
 import dbsdemo.sql.HibernateUtil;
+import java.math.BigInteger;
 import java.util.List;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
@@ -59,5 +61,25 @@ public class StationDao extends GenericDao<Station> {
         
         t.commit();
         session.close();
+    }
+    
+    public int getNumberOfStations(){
+        
+        sf = HibernateUtil.getSessionFactory();
+        Session session = sf.openSession();
+        String select = "SELECT count(*) FROM stations";
+        SQLQuery query = session.createSQLQuery(select);
+        
+        int result;
+        try {
+            result = ((BigInteger) query.uniqueResult()).intValue();
+        }
+        catch (NullPointerException e){
+            // No ratings available for the station
+            result = 0;
+        }
+        
+        session.close();
+        return result;
     }
 }

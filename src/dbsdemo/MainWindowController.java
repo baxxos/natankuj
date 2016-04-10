@@ -19,6 +19,7 @@ import dbsdemo.sql.custom.PriceDao;
 import dbsdemo.sql.custom.RatingDao;
 import java.io.IOException;
 import java.net.URL;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -57,7 +58,9 @@ import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Region;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
+import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 
 /**
@@ -117,11 +120,32 @@ public class MainWindowController implements Initializable {
     private LineChart<?, ?> chartGasoline;
     @FXML
     private LineChart<?, ?> chartDiesel;
-    // Misc GUI components
+    // Information labels
+    @FXML
+    private Label labelAvgGasoline;
+    @FXML
+    private Label labelAvgDiesel;
+    @FXML
+    private Label labelLowestGasoline;
+    @FXML
+    private Label labelLowestDiesel;
+    @FXML
+    private Label labelStationsInDb;
+    @FXML
+    private Label labelLastUpdate;
     @FXML
     private Label userNameLabel;
     @FXML
+    private Label labelTotalRatings;
+    @FXML
+    private Label labelTotalRatingsUser;
+    @FXML
+    private Label labelAvgUser;
+    // Misc GUI components
+    @FXML
     private Font x1;
+    @FXML
+    private Font x2;
     // Controller private attributes
     private User activeUser;
     private ObservableList<String> brands;
@@ -129,8 +153,36 @@ public class MainWindowController implements Initializable {
     private ObservableList<Offer> offers;
     private final ObservableList<String> actions = FXCollections.observableArrayList();
     private final ObservableList<String> actionTargets = FXCollections.observableArrayList();
-    @FXML
-    private Font x2;
+    
+    public void populateLabels(){
+        
+        RatingDao ratingDao = new RatingDao();
+        PriceDao priceDao = new PriceDao();
+        FuelTypeDao fuelTypeDao = new FuelTypeDao();
+        OfferDao offerDao = new OfferDao();
+        
+        this.labelAvgGasoline.setText("Priemerná cena: "+priceDao.getAvgLatest(fuelTypeDao.getFuelType("95")));
+        this.labelAvgDiesel.setText("Priemerná cena: "+priceDao.getAvgLatest(fuelTypeDao.getFuelType("Diesel")));
+        this.labelStationsInDb.setText("Počet ČS v databáze: "+new StationDao().getNumberOfStations());
+        this.labelLastUpdate.setText("Posledná aktualizácia: "+new SimpleDateFormat("dd.MM.yyyy").format(priceDao.getLatestPrice()));
+        this.labelTotalRatings.setText("Hodnotení celkovo: "+ratingDao.getNumberOfRatingsTotal());
+        
+        Price price = priceDao.getCheapestPrice(fuelTypeDao.getFuelType("95"));
+        this.labelLowestGasoline.setText(
+                "Historické minimum: "+ price.getPrice() +
+                "€ ("+new SimpleDateFormat("dd.MM.yyyy").format(price.getDate()) +
+                ")");
+        price = priceDao.getCheapestPrice(fuelTypeDao.getFuelType("Diesel"));
+        this.labelLowestDiesel.setText(
+                "Historické minimum: " + price.getPrice() + 
+                "€ ("+new SimpleDateFormat("dd.MM.yyyy").format(price.getDate()) +
+                ")");
+
+        if(this.activeUser != null){
+            this.labelTotalRatingsUser.setText("Počet Vašich hodnotení: "+ratingDao.getNumberOfRatings(this.activeUser));
+            this.labelAvgUser.setText("Vaše priemerné hodnotenie: "+ratingDao.getAverage(this.activeUser));
+        }
+    }
     
     public void populateComboBoxes(){
         
@@ -180,7 +232,6 @@ public class MainWindowController implements Initializable {
             new PropertyValueFactory<>("date")
         );
         this.tableView.setItems(offers);
-        //Tooltip.install(this.colFuelBrand, new Tooltip("Ahoj"));
     }
     
     public void populateCharts(){
@@ -216,16 +267,16 @@ public class MainWindowController implements Initializable {
         
         // Modify chart styles
         chartGasoline.setCreateSymbols(false);
-        Set<Node> lineNode = chartGasoline.lookupAll(".series0");  
+        chartDiesel.setCreateSymbols(false);
+        /*Set<Node> lineNode = chartGasoline.lookupAll(".series0");  
           for (final Node line : lineNode) {  
                line.setStyle("-fx-stroke: #58B500;");  
         }
-          
-        chartDiesel.setCreateSymbols(false);
+        
         lineNode = chartDiesel.lookupAll(".series0");  
           for (final Node line : lineNode) {  
                line.setStyle("-fx-stroke: #0077FF;");  
-        }
+        }*/
     }
     
     private void addContextMenu(Region region){
@@ -239,11 +290,26 @@ public class MainWindowController implements Initializable {
         primaryMenu.getItems().add(recDeletion);
         
         ContextMenu secondaryMenu = new ContextMenu();
+        secondaryMenu.setStyle("-fx-background-color: #0096c9");
         
         region.addEventHandler(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent t) {
-                MenuItem fakeTooltip = new MenuItem(tableView.getSelectionModel().getSelectedItem().toString());
+                
+                MenuItem fakeTooltip = new MenuItem();
+                
+                try {
+                    
+                    Label label = new Label(tableView.getSelectionModel().getSelectedItem().toString());
+                    label.setPrefWidth(230);
+                    label.setWrapText(true);
+                    label.setTextAlignment(TextAlignment.JUSTIFY);
+                    label.setTextFill(Color.web("#ffffff"));
+                    fakeTooltip.setGraphic(label);
+                }
+                catch(NullPointerException npe){
+                    return;
+                }
                 
                 final Scene scene = tableView.getScene();
                 final Point2D windowCoord = new Point2D(scene.getWindow().getX(), scene.getWindow().getY());
@@ -339,9 +405,9 @@ public class MainWindowController implements Initializable {
                 price.setOffer(offer);
                 price.setUser(activeUser);
                 
-                TextInputDialog dialog = new TextInputDialog("5.0");
+                TextInputDialog dialog = new TextInputDialog("");
                 dialog.setContentText("Zadajte novú cenu:");
-                dialog.setHeaderText("Prosím, zadajte desatinné číslo v tvare X.XXXX alebo kratšom");
+                dialog.setHeaderText("Prosím, zadajte cenu v tvare desatinného čísla");
                 dialog.setTitle("Aktualizácia ponuky čerpacej stanice");
                 
                 String response;
@@ -374,7 +440,11 @@ public class MainWindowController implements Initializable {
                 // Assign date and insert new price
                 price.setDate(Calendar.getInstance().getTime());
                 new PriceDao().insert(price);
-                // Update affected station row                
+                // Refresh main window data
+                MainWindowController.this.populateCharts();
+                MainWindowController.this.populateLabels();
+                // Update affected station row             
+                offer.addPrice(price);
                 MainWindowController.this.offers.set(
                         MainWindowController.this.offers.indexOf(offer),
                         offer
@@ -416,6 +486,7 @@ public class MainWindowController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         // Populate content in comboBoxes and tableViews
+        this.populateLabels();
         this.populateTable();
         this.populateComboBoxes();
         this.populateCharts();
@@ -545,9 +616,13 @@ public class MainWindowController implements Initializable {
     }
 
     public void setActiveUser(User activeUser) {
+        
+        RatingDao ratingDao = new RatingDao();
         // Assign active user - needed for editing etc.
         this.activeUser = activeUser;
         this.userNameLabel.setText("Logged in as: " + (this.activeUser == null ? "-" : this.activeUser.getUsername()));
+        this.labelTotalRatingsUser.setText("Počet Vašich hodnotení: "+ratingDao.getNumberOfRatings(this.activeUser));
+        this.labelAvgUser.setText("Vaše priemerné hodnotenie: "+ratingDao.getAverage(this.activeUser));
         // Enable editing - editing level is handled by method itself
         enableEditing();
         // Control the user actions based on userLevel

@@ -3,6 +3,7 @@ package dbsdemo.sql.custom;
 import dbsdemo.entities.FuelType;
 import dbsdemo.entities.Offer;
 import dbsdemo.entities.Price;
+import dbsdemo.entities.Station;
 import dbsdemo.sql.GenericDao;
 import dbsdemo.sql.HibernateUtil;
 import java.util.ArrayList;
@@ -47,6 +48,29 @@ public class PriceDao extends GenericDao<Price> {
         return result;
     }
     
+    public Date getLatestPrice(){
+        
+        sf = HibernateUtil.getSessionFactory();
+        Session session = sf.openSession();
+        String select = "SELECT id, price, insertion_date, user_id, offer_id "
+                + "FROM prices ORDER BY insertion_date DESC LIMIT 1";
+        SQLQuery query = session.createSQLQuery(select);
+        
+        Price result;
+        try {
+            result = (Price) query
+                    .addEntity(Price.class)
+                    .uniqueResult();
+        }
+        catch (NullPointerException e){
+            // No ratings available for the station
+            session.close();
+            return null;
+        }
+        session.close();
+        return result.getDate();
+    }
+    
     public List<MonthlyAverage> getAvgMonthPrices(FuelType fuelType){
         
         sf = HibernateUtil.getSessionFactory();
@@ -73,6 +97,62 @@ public class PriceDao extends GenericDao<Price> {
             result.get(i).setMonthAvg((Double) tempResult.get(i)[1]);
         }
         
+        session.close();
+        return result;
+    }
+
+    public Double getAvgLatest(FuelType fuelType){
+        
+        sf = HibernateUtil.getSessionFactory();
+        Session session = sf.openSession();
+        String select = "SELECT CAST(round(CAST(avg(ag) AS numeric),3) AS double precision) FROM "
+                + "(SELECT avg(price) as ag, fuel_brand_id FROM "
+                + "(SELECT * FROM prices p "
+                + "LEFT OUTER JOIN offers o ON p.offer_id = o.id "
+                + "LEFT OUTER JOIN fuels f ON o.fuel_id = f.id "
+                + "LEFT OUTER JOIN fuel_types ft ON f.fuel_type_id = ft.id "
+                + "WHERE fuel_type =:fuelType "
+                + "ORDER BY insertion_date DESC LIMIT 10) sub "
+                + "GROUP BY fuel_brand_id ) sub2 ";
+        SQLQuery query = session.createSQLQuery(select);
+        Double result;
+        
+        try {
+            result = (Double) query
+                    .setParameter("fuelType", fuelType.getType())
+                    .uniqueResult();
+        }
+        catch(NullPointerException npe){
+            result = 0.0;
+        }
+        
+        session.close();
+        return result;
+    }
+    
+        public Price getCheapestPrice(FuelType fuelType){
+        
+        sf = HibernateUtil.getSessionFactory();
+        Session session = sf.openSession();
+        String select = "SELECT * FROM prices p "
+                + "LEFT OUTER JOIN offers o ON p.offer_id = o.id "
+                + "LEFT OUTER JOIN fuels f ON o.fuel_id = f.id "
+                + "WHERE f.fuel_type_id =:fuel_type_id "
+                + "ORDER BY price ASC LIMIT 1 ";
+        SQLQuery query = session.createSQLQuery(select);
+        
+        Price result;
+        try {
+            result = (Price) query
+                    .addEntity(Price.class)
+                    .setParameter("fuel_type_id", fuelType.getId())
+                    .uniqueResult();
+        }
+        catch (NullPointerException e){
+            // No prices available
+            session.close();
+            return null;
+        }
         session.close();
         return result;
     }

@@ -1,11 +1,15 @@
 package dbsdemo.entities;
 
 import dbsdemo.sql.custom.PriceDao;
+import dbsdemo.sql.custom.RatingDao;
 import java.io.Serializable;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -13,6 +17,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 /**
  *
@@ -28,7 +33,7 @@ public class Offer implements Serializable {
     @ManyToOne
     @JoinColumn(name="fuel_id", nullable=false)
     private Fuel fuel;
-    @OneToMany(mappedBy="offer", cascade=CascadeType.REMOVE)
+    @OneToMany(mappedBy="offer", fetch = FetchType.EAGER, cascade=CascadeType.REMOVE)
     private List<Price> prices;
     
     @Id
@@ -48,7 +53,8 @@ public class Offer implements Serializable {
     public String toString(){
         return (this.getBrand()+"\n"
                 +this.getCity()+"\n"
-                +this.getLocation()+"\n"
+                +this.getLocation()+"\n\n"
+                +"Hodnotenie: "+this.getRatings()+" (hlasov: "+new RatingDao().getNumberOfRatings(this.station)+")\n"
                 +this.fuel.getBrand().getBrand()+"\n"
                 +this.fuel.getBrand().getDescription()
         );
@@ -75,25 +81,49 @@ public class Offer implements Serializable {
     }
     
     public Double getPrice(){
+        
+        Date recent = new Date(Integer.MIN_VALUE);
+        Price result = null;
+        for(Price price : this.prices){
+            if(price.getDate().after(recent)){
+                recent = price.getDate();
+                result = price;
+            }
+        }
+        
+        return result == null ? 0.0 :result.getPrice();
+        /* TODO - very slow redraw in JavaFx TableView
         try {
             return new PriceDao().getLatestPrice(this).getPrice();
         }
         catch(NullPointerException npe){
             return 0.0;
-        }
+        }*/
     }
     
     public String getDate(){
+        
+        Date recent = new Date(Integer.MIN_VALUE);
+        Price result = null;
+        for(Price price : this.prices){
+            if(price.getDate().after(recent)){
+                recent = price.getDate();
+                result = price;
+            }
+        }
+        
+        return result == null ? "-" : new SimpleDateFormat("dd.MM.yyyy").format(result.getDate());
+        /*TODO - very slow redraw in JavaFx TableView
         try {
             return (
-                new SimpleDateFormat("yyyy/MM/dd").format(
+                new SimpleDateFormat("dd.MM.yyyy").format(
                     new PriceDao().getLatestPrice(this).getDate()
                 )
             );
         }
         catch(NullPointerException npe){
             return "-";
-        }
+        }*/
     }
     
     public Double getRatings(){
@@ -122,5 +152,9 @@ public class Offer implements Serializable {
 
     public void setId(int id) {
         this.id = id;
+    }
+    
+    public void addPrice(Price price){
+        this.prices.add(price);
     }
 }
