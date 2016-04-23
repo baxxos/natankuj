@@ -4,13 +4,14 @@
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
             <file>file:/C:/Users/Baxos/Desktop/NetBeans/natankuj/src/dbsdemo/MainWindowController.java</file>
-            <file>file:/C:/Users/Baxos/Desktop/NetBeans/natankuj/src/dbsdemo/sql/custom/PriceDao.java</file>
             <file>file:/C:/Users/Baxos/Desktop/NetBeans/natankuj/src/dbsdemo/sql/custom/RatingDao.java</file>
             <file>file:/C:/Users/Baxos/Desktop/NetBeans/natankuj/src/dbsdemo/sql/custom/CityDao.java</file>
-            <file>file:/C:/Users/Baxos/Desktop/NetBeans/natankuj/src/dbsdemo/sql/custom/UserDao.java</file>
-            <file>file:/C:/Users/Baxos/Desktop/NetBeans/natankuj/src/dbsdemo/entities/Offer.java</file>
-            <file>file:/C:/Users/Baxos/Desktop/NetBeans/natankuj/src/dbsdemo/sql/custom/OfferDao.java</file>
+            <file>file:/C:/Users/Baxos/Desktop/NetBeans/natankuj/src/dbsdemo/StationWindowController.java</file>
+            <file>file:/C:/Users/Baxos/Desktop/NetBeans/natankuj/src/dbsdemo/gui/LoginWindow.fxml</file>
             <file>file:/C:/Users/Baxos/Desktop/NetBeans/natankuj/src/dbsdemo/sql/custom/FuelTypeDao.java</file>
+            <file>file:/C:/Users/Baxos/Desktop/NetBeans/natankuj/src/dbsdemo/LoginWindowController.java</file>
+            <file>file:/C:/Users/Baxos/Desktop/NetBeans/natankuj/etc/config.properties</file>
+            <file>file:/C:/Users/Baxos/Desktop/NetBeans/natankuj/src/dbsdemo/sql/custom/FuelBrandDao.java</file>
         </group>
     </open-files>
 </project-private>

@@ -46,7 +46,6 @@ public class LoginWindowController implements Initializable {
     
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        // TODO
     }    
     
     public void goToMainWindowScene(User user){
@@ -120,7 +119,7 @@ public class LoginWindowController implements Initializable {
             goToMainWindowScene(activeUser);
             this.actStage.close();
         }
-        catch(IndexOutOfBoundsException e) {
+        catch(NullPointerException e) {
             new CustomAlert(
                     Alert.AlertType.ERROR,
                     "Error",

@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.collections.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane id="AnchorPane" prefHeight="297.0" prefWidth="600.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/2.2" fx:controller="dbsdemo.StationWindowController">
+  <children>
+    <ComboBox fx:id="brandsComboBox" layoutX="14.0" layoutY="40.0" prefWidth="200.0">
+      <items>
+        <FXCollections fx:factory="observableArrayList">
+          <String fx:value="Item 1" />
+          <String fx:value="Item 2" />
+          <String fx:value="Item 3" />
+        </FXCollections>
+      </items>
+    </ComboBox>
+    <ComboBox fx:id="cityComboBox" layoutX="14.0" layoutY="105.0" prefWidth="200.0">
+      <items>
+        <FXCollections fx:factory="observableArrayList">
+          <String fx:value="Item 1" />
+          <String fx:value="Item 2" />
+          <String fx:value="Item 3" />
+        </FXCollections>
+      </items>
+    </ComboBox>
+    <TextField fx:id="locationTextField" layoutX="14.0" layoutY="162.0" prefWidth="200.0" promptText="Zadajte presný opis lokality" text="" />
+    <ComboBox fx:id="fuelBrandsComboBox" layoutX="242.0" layoutY="162.0" prefWidth="200.0" promptText="Vyberte značku paliva">
+      <items>
+        <FXCollections fx:factory="observableArrayList">
+          <String fx:value="Item 1" />
+          <String fx:value="Item 2" />
+          <String fx:value="Item 3" />
+        </FXCollections>
+      </items>
+    </ComboBox>
+    <Button fx:id="buttonAddFuelBrand" layoutX="475.0" layoutY="162.0" mnemonicParsing="false" onAction="#actionAddToList" text="Pridať palivo" />
+    <Button fx:id="buttonCancel" layoutX="191.0" layoutY="256.0" mnemonicParsing="false" onAction="#actionCancel" prefWidth="111.0" text="Zrušiť" />
+    <Button fx:id="buttonAddStation" layoutX="320.0" layoutY="256.0" mnemonicParsing="false" onAction="#actionSave" prefWidth="111.0" text="Pridať ČS" />
+    <Label layoutX="14.0" layoutY="14.0" prefHeight="25.0001220703125" text="Značka ČS:" />
+    <Label layoutX="14.0" layoutY="81.0" text="Mesto" />
+    <Label layoutX="14.0" layoutY="142.0" text="Lokalita" />
+    <ListView fx:id="listFuelBrands" layoutX="242.0" layoutY="40.0" prefHeight="115.0" prefWidth="344.0" />
+    <Separator prefWidth="600.0" AnchorPane.leftAnchor="3.0" AnchorPane.rightAnchor="-3.0" AnchorPane.topAnchor="241.0" />
+    <Label layoutX="243.0" layoutY="14.0" text="Ponúkané palivá" />
+    <RadioButton fx:id="radioButtonN95" layoutX="242.0" layoutY="203.0" mnemonicParsing="false" selected="true" text="NAT 95">
+      <toggleGroup>
+        <ToggleGroup fx:id="fuelTypeGroup" />
+      </toggleGroup>
+    </RadioButton>
+    <RadioButton fx:id="radioButtonN98" layoutX="342.0" layoutY="203.0" mnemonicParsing="false" selected="false" text="NAT 98" toggleGroup="$fuelTypeGroup" />
+    <RadioButton fx:id="radioButtonDiesel" layoutX="442.0" layoutY="203.0" mnemonicParsing="false" text="Diesel" toggleGroup="$fuelTypeGroup" />
+    <Button layoutX="551.0" layoutY="200.0" minWidth="33.0" mnemonicParsing="false" onAction="#actionCancelFilter" prefWidth="36.0" text="X" textFill="#cc0000" />
+  </children>
+</AnchorPane>

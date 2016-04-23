@@ -20,13 +20,11 @@ import dbsdemo.sql.custom.RatingDao;
 import java.io.IOException;
 import java.net.URL;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Properties;
 import java.util.ResourceBundle;
-import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.collections.FXCollections;
@@ -37,7 +35,6 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.geometry.Point2D;
-import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.chart.LineChart;
@@ -573,7 +570,10 @@ public class MainWindowController implements Initializable {
                 }
             }
             else if(actionTarget.equals("Čerpacia stanica")){
-                if(action.equals("Upraviť") ||
+                if(action.equals("Pridať")){
+                    goToStationWindowScene();
+                }
+                else if(action.equals("Upraviť") ||
                     action.equals("Vymazať")){
                     this.tabPaneMain.getSelectionModel().select(1);
                 }
@@ -587,6 +587,28 @@ public class MainWindowController implements Initializable {
                     "Please select a valid action and action target"
             ).showAndWait();
             Logger.getLogger(MainWindowController.class.getName()).log(Level.SEVERE, null, e);
+        }
+    }
+    
+    public void goToStationWindowScene(){  
+        // Load properties file - TODO catch exception
+        Properties prop = PropLoader.load("etc/config.properties");
+        // Continue to user registration screen
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(prop.getProperty("StationWindowPath")));
+            Parent root = (Parent) loader.load();
+            
+            Stage stationWindowStage = new Stage();
+            stationWindowStage.setTitle("New gas station addition");
+            stationWindowStage.setMinHeight(stationWindowStage.getHeight());
+            stationWindowStage.setMinWidth(stationWindowStage.getWidth());
+            stationWindowStage.setScene(new Scene(root));
+            
+            StationWindowController stationWindowController = loader.getController();
+            
+            stationWindowStage.show();
+        } catch (IOException ex) {
+            Logger.getLogger(LoginWindowController.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
