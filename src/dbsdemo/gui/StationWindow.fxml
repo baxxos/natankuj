@@ -7,7 +7,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane id="AnchorPane" prefHeight="297.0" prefWidth="600.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/2.2" fx:controller="dbsdemo.StationWindowController">
+<AnchorPane id="AnchorPane" fx:id="mainPane" prefHeight="297.0" prefWidth="600.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/2.2" fx:controller="dbsdemo.StationWindowController">
   <children>
     <ComboBox fx:id="brandsComboBox" layoutX="14.0" layoutY="40.0" prefWidth="200.0">
       <items>
@@ -27,7 +27,6 @@
         </FXCollections>
       </items>
     </ComboBox>
-    <TextField fx:id="locationTextField" layoutX="14.0" layoutY="162.0" prefWidth="200.0" promptText="Zadajte presný opis lokality" text="" />
     <ComboBox fx:id="fuelBrandsComboBox" layoutX="242.0" layoutY="162.0" prefWidth="200.0" promptText="Vyberte značku paliva">
       <items>
         <FXCollections fx:factory="observableArrayList">

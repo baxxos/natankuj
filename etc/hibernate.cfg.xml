@@ -20,6 +20,7 @@
     <property name="hbm2ddl.auto">
         update
     </property>
+    
     <mapping class="dbsdemo.entities.User" />
     <mapping class="dbsdemo.entities.Station" />
     <mapping class="dbsdemo.entities.StationBrand" />
