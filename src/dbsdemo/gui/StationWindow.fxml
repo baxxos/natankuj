@@ -53,5 +53,11 @@
     <RadioButton fx:id="radioButtonN98" layoutX="342.0" layoutY="203.0" mnemonicParsing="false" selected="false" text="NAT 98" toggleGroup="$fuelTypeGroup" />
     <RadioButton fx:id="radioButtonDiesel" layoutX="442.0" layoutY="203.0" mnemonicParsing="false" text="Diesel" toggleGroup="$fuelTypeGroup" />
     <Button layoutX="551.0" layoutY="200.0" minWidth="33.0" mnemonicParsing="false" onAction="#actionCancelFilter" prefWidth="36.0" text="X" textFill="#cc0000" />
+    <ComboBox fx:id="locationComboBox" layoutX="14.0" layoutY="165.0" prefWidth="200.0">
+      <items>
+        <FXCollections fx:factory="observableArrayList">
+        </FXCollections>
+      </items>
+    </ComboBox>
   </children>
 </AnchorPane>

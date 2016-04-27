@@ -69,7 +69,7 @@
     <jar href="lib/snakeyaml-1.15.jar" size="269295" download="eager" />
     <jar href="lib/spatial4j-0.5.jar" size="148571" download="eager" />
     <jar href="lib/t-digest-3.0.jar" size="49754" download="eager" />
-    <jar href="natankuj.jar" size="90111" download="eager" />
+    <jar href="natankuj.jar" size="93282" download="eager" />
   </resources>
   <applet-desc  width="800" height="600" main-class="com.javafx.main.NoJavaFXFallback"  name="natankuj" >
     <param name="requiredFXVersion" value="8.0+"/>

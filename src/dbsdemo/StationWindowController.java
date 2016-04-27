@@ -19,6 +19,7 @@ import java.net.InetAddress;
 import java.net.URL;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
@@ -40,6 +41,9 @@ import javafx.scene.control.Toggle;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Circle;
+import javafx.stage.Popup;
 import javafx.stage.Stage;
 import np.com.ngopal.control.AutoFillTextBox;
 import org.elasticsearch.action.search.SearchResponse;
@@ -48,6 +52,9 @@ import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.common.transport.InetSocketTransportAddress;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
+import org.elasticsearch.search.aggregations.AggregationBuilders;
+import org.elasticsearch.search.aggregations.bucket.terms.Terms;
+import org.elasticsearch.search.aggregations.bucket.terms.Terms.Bucket;
 
 /**
  * FXML Controller class
@@ -86,6 +93,8 @@ public class StationWindowController implements Initializable {
     private RadioButton radioButtonDiesel;
     @FXML
     private AnchorPane mainPane;
+    @FXML
+    private ComboBox<String> locationComboBox;
     
     public void populateComboBoxes(){
         
@@ -129,19 +138,8 @@ public class StationWindowController implements Initializable {
                 }
             }
         });
-        
-        locationBox.setStyle("-fx-skin: \"np.com.ngopal.control.AutoFillTextBoxSkin\";");
-        locationBox.setPrefWidth(200);
-        locationBox.setLayoutX(14);
-        locationBox.setLayoutY(168);
-        locationBox.getTextbox().setPromptText("Zadajte presný opis lokality");
-        locationBox.getTextbox().addEventHandler(KeyEvent.KEY_TYPED, new EventHandler<KeyEvent>() {
-            @Override
-            public void handle(KeyEvent t) {
-                locationBox.getData().setAll(getElasticResult(locationBox.getTextbox().getText()));
-            }
-        });
-        this.mainPane.getChildren().add(locationBox);       
+
+        FxUtil.autoCompleteComboBox(locationComboBox, FxUtil.AutoCompleteMode.STARTS_WITH, this);     
     }    
 
     @FXML
@@ -174,7 +172,6 @@ public class StationWindowController implements Initializable {
             this.station.setLocation(location.length() > 0 ? location : city);
             new StationDao().insert(station);
             
-            List<Fuel> fuels = new ArrayList<>();
             FuelDao fuelDao = new FuelDao();
             FuelBrandDao fuelBrandDao = new FuelBrandDao();
             FuelTypeDao fuelTypeDao = new FuelTypeDao();
@@ -197,15 +194,20 @@ public class StationWindowController implements Initializable {
         this.testElastic();
     }
     
-    private List<String> getElasticResult(String query){
+    public List<String> getElasticResult(String query){
         List<String> data = new ArrayList<>();
-        SearchResponse response = this.elClient.prepareSearch("dbs")
+        
+        SearchResponse response = this.elClient
+                .prepareSearch("dbs")
                 .setQuery(QueryBuilders.matchQuery("location", query))
+                .addAggregation(AggregationBuilders.terms("by_location").field("location.raw").size(0))
                 .execute().actionGet();
-        SearchHit[] results = response.getHits().getHits();
-        for (SearchHit hit : results) {
-            Map<String, Object> result = hit.getSource();
-            data.add(result.get("location").toString());
+        
+        Terms terms = response.getAggregations().get("by_location");
+        Collection<Bucket> results = terms.getBuckets();
+
+        for (Bucket bucket : results) {
+            data.add(bucket.getKeyAsString());
         }
         return data;
     }
