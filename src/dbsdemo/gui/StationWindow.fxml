@@ -7,7 +7,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane id="AnchorPane" fx:id="mainPane" prefHeight="297.0" prefWidth="600.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/2.2" fx:controller="dbsdemo.StationWindowController">
+<AnchorPane id="AnchorPane" fx:id="mainPane" prefHeight="283.0" prefWidth="603.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/2.2" fx:controller="dbsdemo.StationWindowController">
   <children>
     <ComboBox fx:id="brandsComboBox" layoutX="14.0" layoutY="40.0" prefWidth="200.0">
       <items>
@@ -27,7 +27,7 @@
         </FXCollections>
       </items>
     </ComboBox>
-    <ComboBox fx:id="fuelBrandsComboBox" layoutX="242.0" layoutY="162.0" prefWidth="200.0" promptText="Vyberte značku paliva">
+    <ComboBox fx:id="fuelBrandsComboBox" layoutX="242.0" layoutY="166.0" prefWidth="170.0" promptText="Výber značky paliva">
       <items>
         <FXCollections fx:factory="observableArrayList">
           <String fx:value="Item 1" />
@@ -36,27 +36,26 @@
         </FXCollections>
       </items>
     </ComboBox>
-    <Button fx:id="buttonAddFuelBrand" layoutX="475.0" layoutY="162.0" mnemonicParsing="false" onAction="#actionAddToList" text="Pridať palivo" />
-    <Button fx:id="buttonCancel" layoutX="191.0" layoutY="256.0" mnemonicParsing="false" onAction="#actionCancel" prefWidth="111.0" text="Zrušiť" />
-    <Button fx:id="buttonAddStation" layoutX="320.0" layoutY="256.0" mnemonicParsing="false" onAction="#actionSave" prefWidth="111.0" text="Pridať ČS" />
+    <Button fx:id="buttonAddFuelBrand" layoutX="441.0" layoutY="166.0" mnemonicParsing="false" onAction="#actionAddToList" prefWidth="111.0" text="Pridať palivo" />
+    <Button fx:id="buttonCancel" layoutX="191.0" layoutY="233.0" mnemonicParsing="false" onAction="#actionCancel" prefWidth="111.0" text="Zrušiť" />
+    <Button fx:id="buttonAddStation" layoutX="320.0" layoutY="233.0" mnemonicParsing="false" onAction="#actionSave" prefWidth="111.0" text="Pridať ČS" />
     <Label layoutX="14.0" layoutY="14.0" prefHeight="25.0001220703125" text="Značka ČS:" />
     <Label layoutX="14.0" layoutY="81.0" text="Mesto" />
     <Label layoutX="14.0" layoutY="142.0" text="Lokalita" />
-    <ListView fx:id="listFuelBrands" layoutX="242.0" layoutY="40.0" prefHeight="115.0" prefWidth="344.0" />
-    <Separator prefWidth="600.0" AnchorPane.leftAnchor="3.0" AnchorPane.rightAnchor="-3.0" AnchorPane.topAnchor="241.0" />
+    <ListView fx:id="listFuelBrands" layoutX="242.0" layoutY="40.0" prefHeight="115.0" prefWidth="264.0" />
+    <Separator prefWidth="600.0" AnchorPane.leftAnchor="3.0" AnchorPane.rightAnchor="-3.0" AnchorPane.topAnchor="210.0" />
     <Label layoutX="243.0" layoutY="14.0" text="Ponúkané palivá" />
-    <RadioButton fx:id="radioButtonN95" layoutX="242.0" layoutY="203.0" mnemonicParsing="false" selected="true" text="NAT 95">
+    <RadioButton fx:id="radioButtonN95" layoutX="515.0" layoutY="41.0" mnemonicParsing="false" selected="true" text="NAT 95">
       <toggleGroup>
         <ToggleGroup fx:id="fuelTypeGroup" />
       </toggleGroup>
     </RadioButton>
-    <RadioButton fx:id="radioButtonN98" layoutX="342.0" layoutY="203.0" mnemonicParsing="false" selected="false" text="NAT 98" toggleGroup="$fuelTypeGroup" />
-    <RadioButton fx:id="radioButtonDiesel" layoutX="442.0" layoutY="203.0" mnemonicParsing="false" text="Diesel" toggleGroup="$fuelTypeGroup" />
-    <Button layoutX="551.0" layoutY="200.0" minWidth="33.0" mnemonicParsing="false" onAction="#actionCancelFilter" prefWidth="36.0" text="X" textFill="#cc0000" />
-    <ComboBox fx:id="locationComboBox" layoutX="14.0" layoutY="165.0" prefWidth="200.0">
+    <RadioButton fx:id="radioButtonN98" layoutX="515.0" layoutY="87.0" mnemonicParsing="false" selected="false" text="NAT 98" toggleGroup="$fuelTypeGroup" />
+    <RadioButton fx:id="radioButtonDiesel" layoutX="515.0" layoutY="132.0" mnemonicParsing="false" text="Diesel" toggleGroup="$fuelTypeGroup" />
+    <Button layoutX="550.0" layoutY="166.0" minWidth="33.0" mnemonicParsing="false" onAction="#actionCancelFilter" prefWidth="36.0" text="X" textFill="#cc0000" />
+    <ComboBox fx:id="locationComboBox" editable="false" layoutX="14.0" layoutY="165.0" prefWidth="200.0">
       <items>
-        <FXCollections fx:factory="observableArrayList">
-        </FXCollections>
+        <FXCollections fx:factory="observableArrayList" />
       </items>
     </ComboBox>
   </children>

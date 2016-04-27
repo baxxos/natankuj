@@ -91,10 +91,23 @@
                         <Font name="System Bold" size="20.0" fx:id="x1" />
                       </font>
                     </Label>
-                    <Button fx:id="filterButton" layoutX="16.0" layoutY="334.0" minWidth="120.0" mnemonicParsing="false" onAction="#filterButtonAction" prefWidth="120.0" style="" text="Filtruj" />
+                    <Label layoutX="16.0" layoutY="316.0" text="Lokalita" />
+                    <ComboBox fx:id="locationComboBox" layoutX="16.0" layoutY="339.0" minWidth="160.0" prefWidth="160.0" promptText="-">
+                      <items>
+                        <FXCollections fx:factory="observableArrayList">
+                          <String fx:value="Item 1" />
+                          <String fx:value="Item 2" />
+                          <String fx:value="Item 3" />
+                        </FXCollections>
+                      </items>
+                      <tooltip>
+                        <Tooltip text="Fulltextové vyhľadávanie na základe lokality" />
+                      </tooltip>
+                    </ComboBox>
+                    <Button fx:id="filterButton" layoutX="16.0" layoutY="393.0" minWidth="120.0" mnemonicParsing="false" onAction="#filterButtonAction" prefWidth="120.0" style="" text="Filtruj" />
                     <Button disable="true" layoutX="17.0" mnemonicParsing="false" prefWidth="80.0" style="" text="ENG" underline="false" AnchorPane.bottomAnchor="14.0" />
                     <Button disable="true" layoutX="97.0" mnemonicParsing="false" prefWidth="80.0" style="" text="SK" AnchorPane.bottomAnchor="14.0" />
-                    <Button fx:id="cancelFilterButton" contentDisplay="CENTER" graphicTextGap="4.0" layoutX="136.0" layoutY="334.0" minWidth="33.0" mnemonicParsing="false" onAction="#cancelFilter" prefWidth="40.0" style="" text="X" textAlignment="CENTER" textFill="#cc0000">
+                    <Button fx:id="cancelFilterButton" contentDisplay="CENTER" graphicTextGap="4.0" layoutX="136.0" layoutY="393.0" minWidth="33.0" mnemonicParsing="false" onAction="#cancelFilter" prefWidth="40.0" style="" text="X" textAlignment="CENTER" textFill="#cc0000">
                       <font>
                         <Font size="15.0" fx:id="x2" />
                       </font>

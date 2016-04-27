@@ -5,9 +5,11 @@
  */
 package dbsdemo;
 
-import dbsdemo.entities.Fuel;
+import dbsdemo.elastic.ElasticClient;
 import dbsdemo.entities.Offer;
 import dbsdemo.entities.Station;
+import dbsdemo.sql.DatabaseControl;
+import dbsdemo.sql.HibernateUtil;
 import dbsdemo.sql.custom.CityDao;
 import dbsdemo.sql.custom.FuelBrandDao;
 import dbsdemo.sql.custom.FuelDao;
@@ -15,16 +17,9 @@ import dbsdemo.sql.custom.FuelTypeDao;
 import dbsdemo.sql.custom.OfferDao;
 import dbsdemo.sql.custom.StationBrandsDao;
 import dbsdemo.sql.custom.StationDao;
-import java.net.InetAddress;
 import java.net.URL;
-import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
 import java.util.ResourceBundle;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -39,22 +34,9 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.Toggle;
 import javafx.scene.control.ToggleGroup;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.Circle;
-import javafx.stage.Popup;
 import javafx.stage.Stage;
-import np.com.ngopal.control.AutoFillTextBox;
-import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.client.Client;
-import org.elasticsearch.client.transport.TransportClient;
-import org.elasticsearch.common.transport.InetSocketTransportAddress;
-import org.elasticsearch.index.query.QueryBuilders;
-import org.elasticsearch.search.SearchHit;
-import org.elasticsearch.search.aggregations.AggregationBuilders;
-import org.elasticsearch.search.aggregations.bucket.terms.Terms;
-import org.elasticsearch.search.aggregations.bucket.terms.Terms.Bucket;
+import javafx.stage.WindowEvent;
 
 /**
  * FXML Controller class
@@ -67,8 +49,7 @@ public class StationWindowController implements Initializable {
     private ObservableList<String> cities;
     private ObservableList<String> brands;
     private ObservableList<String> fuelBrands;
-    private Client elClient;
-    private AutoFillTextBox locationBox = new AutoFillTextBox();
+    private final ElasticClient client = new ElasticClient();
     @FXML
     private ComboBox<String> brandsComboBox;
     @FXML
@@ -115,31 +96,31 @@ public class StationWindowController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         
-        try {
-            this.elClient = TransportClient.builder().build()
-                    .addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName("localhost"), 9300));
-        } catch (UnknownHostException ex) {
-            Logger.getLogger(StationWindowController.class.getName()).log(Level.SEVERE, null, ex);
-        }
         this.radioButtonN95.setUserData(this.radioButtonN95.getText());
         this.radioButtonN98.setUserData(this.radioButtonN98.getText());
         this.radioButtonDiesel.setUserData(this.radioButtonDiesel.getText());
-        this.populateComboBoxes();
-        
+
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                StationWindowController.this.populateComboBoxes();
+            }
+        });
+
         this.fuelTypeGroup.selectedToggleProperty().addListener(new ChangeListener<Toggle>(){
             @Override
             public void changed(ObservableValue<? extends Toggle> ov, Toggle old_toggle, Toggle new_toggle) {
                 if (fuelTypeGroup.getSelectedToggle() != null) {
                     StationWindowController.this.fuelBrands = FXCollections.observableArrayList(
                              new FuelBrandDao().getFuelBrandsAsString(
-                                     fuelTypeGroup.getSelectedToggle().getUserData().toString()
+                                    fuelTypeGroup.getSelectedToggle().getUserData().toString()
                     ));
                     StationWindowController.this.fuelBrandsComboBox.setItems(StationWindowController.this.fuelBrands);
                 }
             }
         });
 
-        FxUtil.autoCompleteComboBox(locationComboBox, FxUtil.AutoCompleteMode.STARTS_WITH, this);     
+        FxUtil.autoCompleteComboBox(locationComboBox, this.client);     
     }    
 
     @FXML
@@ -154,23 +135,24 @@ public class StationWindowController implements Initializable {
     @FXML
     private void actionCancel(ActionEvent event) {
         ((Stage) this.buttonCancel.getScene().getWindow()).close();
-        this.elClient.close();
     }
 
     @FXML
     private void actionSave(ActionEvent event) {
         String city = this.cityComboBox.getSelectionModel().getSelectedItem();
         String stationBrand = this.brandsComboBox.getSelectionModel().getSelectedItem();
-        String location = (this.locationBox.getText().length() > 255 ?
-                this.locationBox.getText().substring(0, 256) : 
-                this.locationBox.getText()
+        String location = (FxUtil.getComboBoxValue(locationComboBox).length() > 255 ?
+                FxUtil.getComboBoxValue(locationComboBox).substring(0, 256) : 
+                FxUtil.getComboBoxValue(locationComboBox)
         );
-        
+
         if(city != null && stationBrand != null){
             this.station.setCity(new CityDao().getCity(city));
             this.station.setBrand(new StationBrandsDao().getStationBrand(stationBrand));
             this.station.setLocation(location.length() > 0 ? location : city);
             new StationDao().insert(station);
+            
+            client.insert(station);
             
             FuelDao fuelDao = new FuelDao();
             FuelBrandDao fuelBrandDao = new FuelBrandDao();
@@ -185,58 +167,10 @@ public class StationWindowController implements Initializable {
             }
         }
         ((Stage) this.buttonCancel.getScene().getWindow()).close();
-        this.elClient.close();
     }
 
     @FXML
     private void actionCancelFilter(ActionEvent event) {
         this.listFuelBrands.getItems().clear();
-        this.testElastic();
-    }
-    
-    public List<String> getElasticResult(String query){
-        List<String> data = new ArrayList<>();
-        
-        SearchResponse response = this.elClient
-                .prepareSearch("dbs")
-                .setQuery(QueryBuilders.matchQuery("location", query))
-                .addAggregation(AggregationBuilders.terms("by_location").field("location.raw").size(0))
-                .execute().actionGet();
-        
-        Terms terms = response.getAggregations().get("by_location");
-        Collection<Bucket> results = terms.getBuckets();
-
-        for (Bucket bucket : results) {
-            data.add(bucket.getKeyAsString());
-        }
-        return data;
-    }
-    
-    private void testElastic(){
-        try {
-            Client client = TransportClient.builder().build()
-                .addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName("localhost"), 9300));
-            
-            //GetResponse response = client.prepareGet("movies", "movie", "1").execute().actionGet();
-            SearchResponse response = client.prepareSearch("dbs").setQuery(QueryBuilders.matchQuery("location", "bra")).execute().actionGet();
-
-            /*Map<String, Object> source = response.getSource();
-            System.out.println("Index: " + response.getIndex());
-            System.out.println("Type: " + response.getType());
-            System.out.println("Id: " + response.getId());
-            System.out.println("Version: " + response.getVersion());
-            System.out.println(source);*/
-            
-            SearchHit[] results = response.getHits().getHits();
-            System.out.println("Current results: " + results.length);
-            for (SearchHit hit : results) {
-                System.out.println("------------------------------");
-                Map<String, Object> result = hit.getSource();
-                System.out.println(result);
-            }
-            client.close();
-        } catch (UnknownHostException ex) {
-            Logger.getLogger(StationWindowController.class.getName()).log(Level.SEVERE, null, ex);
-        }
     }
 }

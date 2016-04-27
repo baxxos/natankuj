@@ -1,6 +1,7 @@
 package dbsdemo.sql;
 
 import dbsdemo.entities.Offer;
+import dbsdemo.entities.Station;
 import java.util.List;
 import javax.persistence.Table;
 import org.hibernate.SQLQuery;

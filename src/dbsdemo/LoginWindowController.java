@@ -13,6 +13,7 @@ import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -25,6 +26,7 @@ import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Hyperlink;
+import javafx.stage.WindowEvent;
 /**
  * FXML Controller class
  *
@@ -65,6 +67,14 @@ public class LoginWindowController implements Initializable {
             mainWindowStage.setMinWidth(mainWindowStage.getWidth());
             mainWindowStage.setScene(this.actStage.getScene());
             mainWindowStage.getScene().setRoot(root);
+            
+            // Main window stage should close all DB connections on close
+            mainWindowStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
+                @Override
+                public void handle(WindowEvent t) {
+                    mainWindowController.getClient().close();
+                }
+            });
             
             mainWindowStage.show();
         } catch (IOException ex) {

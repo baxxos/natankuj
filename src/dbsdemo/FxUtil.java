@@ -1,6 +1,7 @@
 package dbsdemo;
 
 
+import dbsdemo.elastic.ElasticClient;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
@@ -9,19 +10,11 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 
 public class FxUtil {
-
-    public enum AutoCompleteMode {
-        STARTS_WITH,CONTAINING,;
-    }
-
-    public static void autoCompleteComboBox(ComboBox<String> comboBox, AutoCompleteMode mode, StationWindowController controller) {
+    
+    public static void autoCompleteComboBox(ComboBox<String> comboBox, ElasticClient client) {
 
         comboBox.setEditable(true);
-        comboBox.getEditor().focusedProperty().addListener(observable -> {
-            if (comboBox.getSelectionModel().getSelectedIndex() < 0) {
-                comboBox.getEditor().setText(null);
-            }
-        });
+
         comboBox.addEventHandler(KeyEvent.KEY_PRESSED, t -> comboBox.hide());
         comboBox.addEventHandler(KeyEvent.KEY_RELEASED, new EventHandler<KeyEvent>() {
 
@@ -56,7 +49,7 @@ public class FxUtil {
                 }
 
                 String t = comboBox.getEditor().getText();
-                ObservableList<String> list = FXCollections.observableArrayList(controller.getElasticResult(t));
+                ObservableList<String> list = FXCollections.observableArrayList(client.getElasticResult(t));
                 
                 if(list.size() != comboBox.getItems().size())
                     comboBox.hide();
@@ -87,8 +80,11 @@ public class FxUtil {
         });
     }
 
-    public static<T> T getComboBoxValue(ComboBox<T> comboBox){
-        if (comboBox.getSelectionModel().getSelectedIndex() < 0) {
+    public static String getComboBoxValue(ComboBox<String> comboBox){
+        if(comboBox.getEditor().getText().length() > 0){
+            return comboBox.getEditor().getText();
+        }
+        else if (comboBox.getSelectionModel().getSelectedIndex() < 0) {
             return null;
         } else {
             return comboBox.getItems().get(comboBox.getSelectionModel().getSelectedIndex());

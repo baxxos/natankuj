@@ -1,5 +1,6 @@
 package dbsdemo;
 
+import dbsdemo.elastic.ElasticClient;
 import dbsdemo.entities.Offer;
 import dbsdemo.entities.Price;
 import dbsdemo.entities.Rating;
@@ -59,6 +60,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
+import org.hibernate.SessionFactory;
 
 /**
  * FXML Controller class
@@ -69,7 +71,6 @@ public class MainWindowController implements Initializable {
     // Table related components
     @FXML
     private TableView<Offer> tableView;
-    private TableView<User> tableViewUsers;
     @FXML
     private TabPane tabPaneMain;
     @FXML
@@ -111,6 +112,8 @@ public class MainWindowController implements Initializable {
     @FXML
     private ComboBox<String> fuelTypeComboBox;
     @FXML
+    private ComboBox<String> locationComboBox;
+    @FXML
     private TableColumn<Station, String> colFuelBrand;
     // Charts
     @FXML
@@ -150,6 +153,7 @@ public class MainWindowController implements Initializable {
     private ObservableList<Offer> offers;
     private final ObservableList<String> actions = FXCollections.observableArrayList();
     private final ObservableList<String> actionTargets = FXCollections.observableArrayList();
+    private final ElasticClient client = new ElasticClient();
     
     public void populateLabels(){
         
@@ -477,7 +481,6 @@ public class MainWindowController implements Initializable {
         // Add user list tab to current view and make it active
         this.tabPaneMain.getTabs().add(usersTabController.getUserListTab());
         this.tabPaneMain.getSelectionModel().select(this.tabPaneMain.getTabs().size()-1);
-        this.tableViewUsers = usersTabController.getTableViewUsers();
     }
     
     @Override
@@ -488,6 +491,7 @@ public class MainWindowController implements Initializable {
         this.populateComboBoxes();
         this.populateCharts();
         this.tabPaneMain.setTabClosingPolicy(TabClosingPolicy.ALL_TABS);
+        FxUtil.autoCompleteComboBox(this.locationComboBox, this.client);
     }    
     
     public void enableEditing(){
@@ -678,4 +682,8 @@ public class MainWindowController implements Initializable {
     public User getActiveUser() {
         return activeUser;
     } 
+
+    public ElasticClient getClient() {
+        return client;
+    }
 }

@@ -4,7 +4,6 @@ import dbsdemo.misc.PropLoader;
 import dbsdemo.sql.HibernateUtil;
 import java.io.IOException;
 import java.util.Properties;
-import java.util.logging.Level;
 import javafx.application.Application;
 import javafx.fxml.*;
 import javafx.scene.Parent;
