@@ -9,5 +9,5 @@ currently split into 3 branches:
 </ol>
   
 Screenshots from j2e branch:  
-![project_main_screen](https://drive.google.com/open?id=0B9F-9_QAlgdGWGx4Q3JFTDV4QXM)  
-![project_table_view](https://drive.google.com/open?id=0B9F-9_QAlgdGQmd1WVp5S0owemM)
+![project_main_screen](https://drive.google.com/uc?id=0B9F-9_QAlgdGWGx4Q3JFTDV4QXM)  
+![project_table_view](https://drive.google.com/uc?id=0B9F-9_QAlgdGQmd1WVp5S0owemM)
