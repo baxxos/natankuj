@@ -1,5 +1,5 @@
 natankuj - custom fuel prices database with prices parsed from <a href="http://auto.sme.sk/natankuj/bratislavsky-kraj">natankuj.sme.sk</a>  
-implemented as school project - first usage of relational database later with ORM and WildFly application server  
+implemented as school project - first usage of relational database later also with usage of ORM and WildFly application server  
   
 currently split into 3 branches:
 <ol>
@@ -9,5 +9,6 @@ currently split into 3 branches:
 </ol>
   
 Screenshots from j2e branch:  
+![project_main_screen](https://drive.google.com/uc?id=0B9F-9_QAlgdGQmd1WVp5S0owemM)
 ![project_main_screen](https://drive.google.com/uc?id=0B9F-9_QAlgdGWGx4Q3JFTDV4QXM)  
-![project_table_view](https://drive.google.com/uc?id=0B9F-9_QAlgdGQmd1WVp5S0owemM)
+
