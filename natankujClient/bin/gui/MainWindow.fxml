@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.net.*?>
+<?import java.util.*?>
+<?import javafx.collections.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.chart.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<AnchorPane id="AnchorPane" minHeight="600.0" minWidth="960.0" prefHeight="600.0" prefWidth="1160.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/2.2" fx:controller="controllers.MainWindowController">
+  <children>
+    <SplitPane dividerPositions="0.11314475873544093" focusTraversable="true" orientation="VERTICAL" prefHeight="450.0" prefWidth="800.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+      <items>
+        <AnchorPane maxHeight="65.0" minHeight="65.0" minWidth="0.0" prefHeight="65.0" prefWidth="160.0">
+          <children>
+            <Label fx:id="labelUserArea" layoutX="14.0" layoutY="7.0" prefHeight="51.0" prefWidth="120.0" style="" text="User area:" wrapText="true">
+              <font>
+                <Font name="System Bold" size="15.0" fx:id="x3" />
+              </font>
+            </Label>
+            <Button id="userActionButton" fx:id="fireUserActionButton" layoutX="492.0" layoutY="18.0" mnemonicParsing="false" onAction="#fireUserAction" prefWidth="120.0" style="-fx-base: #99cc00;&#10;-fx-text-fill: white;&#10;-fx-text-fill: linear-gradient(white, #f0f0f0);" text="Ďalej" />
+            <Button fx:id="updateButton" layoutX="664.0" layoutY="18.0" mnemonicParsing="false" onAction="#updateDatabase" prefWidth="120.0" style="-fx-base: #488DE8;&#10;-fx-text-fill: white;&#10;-fx-text-fill: linear-gradient(white, #f0f0f0);" text="Aktualizovať" />
+            <Button id="dropAndCreateButton" fx:id="dropCreateButton" layoutX="834.0" layoutY="18.0" mnemonicParsing="false" onAction="#dropCreateDatabase" prefWidth="120.0" style="-fx-base: #488DE8;&#10;-fx-text-fill: white;&#10;-fx-text-fill: linear-gradient(white, #f0f0f0);" text="Resetovať" />
+            <ComboBox fx:id="actionComboBox" layoutX="145.0" layoutY="19.0" prefWidth="120.0" promptText="Akcia" style="">
+              <items>
+                <FXCollections fx:factory="observableArrayList">
+                  <String fx:value="Item 1" />
+                  <String fx:value="Item 2" />
+                  <String fx:value="Item 3" />
+                </FXCollections>
+              </items>
+            </ComboBox>
+            <ComboBox id="ActionTargetComboBox" fx:id="actionTargetComboBox" layoutX="316.0" layoutY="19.0" prefWidth="120.0" promptText="Cieľ" style="">
+              <items>
+                <FXCollections fx:factory="observableArrayList">
+                  <String fx:value="Item 1" />
+                  <String fx:value="Item 2" />
+                  <String fx:value="Item 3" />
+                </FXCollections>
+              </items>
+            </ComboBox>
+            <Button layoutX="1009.0" layoutY="18.0" mnemonicParsing="false" onAction="#pdfGenerate" prefWidth="120.0" style="-fx-base: #488DE8;&#10;-fx-text-fill: white;&#10;-fx-text-fill: linear-gradient(white, #f0f0f0);" text="PDF Export" />
+          </children>
+        </AnchorPane>
+        <AnchorPane minHeight="530.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
+          <children>
+            <SplitPane dividerPositions="0.17214532871972318" focusTraversable="true" prefHeight="333.0" prefWidth="798.0" style="" AnchorPane.bottomAnchor="1.0" AnchorPane.leftAnchor="-1.0" AnchorPane.rightAnchor="1.0" AnchorPane.topAnchor="-1.0">
+              <items>
+                <AnchorPane maxWidth="196.0" minHeight="0.0" minWidth="196.0" prefHeight="528.0" prefWidth="196.0">
+                  <children>
+                    <Label id="labelSearchStation" fx:id="labelSearchBrand" layoutX="17.0" layoutY="61.0" text="Značka ČS" />
+                    <ComboBox fx:id="brandsComboBox" layoutX="17.0" layoutY="84.0" maxWidth="-1.0" minWidth="160.0" prefWidth="-1.0" promptText="-" style="">
+                      <items>
+                        <FXCollections fx:factory="observableArrayList">
+                          <String fx:value="Item 1" />
+                          <String fx:value="Item 2" />
+                          <String fx:value="Item 3" />
+                        </FXCollections>
+                      </items>
+                    </ComboBox>
+                    <Label fx:id="labelSearchCity" layoutX="16.0" layoutY="128.0" text="Mesto/obec" />
+                    <ComboBox fx:id="cityComboBox" layoutX="18.0" layoutY="150.0" maxWidth="160.0" minWidth="160.0" prefWidth="-1.0" promptText="-" style="">
+                      <items>
+                        <FXCollections fx:factory="observableArrayList">
+                          <String fx:value="Item 1" />
+                          <String fx:value="Item 2" />
+                          <String fx:value="Item 3" />
+                        </FXCollections>
+                      </items>
+                    </ComboBox>
+                    <Label fx:id="labelSearchFuel" layoutX="16.0" layoutY="194.0" text="Typ paliva" />
+                    <ComboBox fx:id="fuelTypeComboBox" layoutX="16.0" layoutY="217.0" minWidth="160.0" prefWidth="-1.0" promptText="-" style="">
+                      <items>
+                        <FXCollections fx:factory="observableArrayList">
+                          <String fx:value="Item 1" />
+                          <String fx:value="Item 2" />
+                          <String fx:value="Item 3" />
+                        </FXCollections>
+                      </items>
+                    </ComboBox>
+                    <Label fx:id="labelSearchRating" layoutX="17.0" layoutY="253.0" text="Hodnotenie" />
+                    <ComboBox fx:id="ratingComboBox" layoutX="17.0" layoutY="277.0" minWidth="160.0" prefWidth="-1.0" promptText="-" style="">
+                      <items>
+                        <FXCollections fx:factory="observableArrayList" />
+                      </items>
+                    </ComboBox>
+                    <Label fx:id="labelSearch" layoutX="16.0" layoutY="14.0" text="Vyhľadávanie">
+                      <font>
+                        <Font name="System Bold" size="20.0" fx:id="x1" />
+                      </font>
+                    </Label>
+                    <Button fx:id="filterButton" layoutX="16.0" layoutY="334.0" minWidth="120.0" mnemonicParsing="false" onAction="#filterButtonAction" prefWidth="120.0" style="-fx-base: #99cc00;&#10;-fx-text-fill: white;&#10;-fx-text-fill: linear-gradient(white, #f0f0f0);" text="Filtruj" />
+                    <Button fx:id="cancelFilterButton" contentDisplay="CENTER" graphicTextGap="4.0" layoutX="136.0" layoutY="334.0" minWidth="33.0" mnemonicParsing="false" onAction="#cancelFilter" prefWidth="40.0" style="-fx-base: #99cc00;" text="X" textAlignment="CENTER" textFill="#cc0000">
+                      <font>
+                        <Font size="15.0" fx:id="x2" />
+                      </font>
+                    </Button>
+                    <ProgressIndicator fx:id="updateIndicator" layoutX="80.0" layoutY="404.0" prefWidth="40.000091552734375" progress="-1.0" visible="false" />
+                    <Button fx:id="buttonLangEn" alignment="CENTER_RIGHT" contentDisplay="LEFT" disable="false" font="$x3" layoutX="17.0" maxHeight="27.0" maxWidth="80.0" mnemonicParsing="false" onAction="#changeLanguageEn" prefHeight="27.0" prefWidth="80.0" style="    -fx-background-image: url(&quot;file:///C:/Users/Baxos/workspace/natankujClient/src/resources/ukFlag.png&quot;);&#10;    -fx-background-size: 80 27;&#10;    -fx-background-repeat: no-repeat;&#10;    -fx-background-position: center;  " text="ENG" textAlignment="CENTER" underline="false" AnchorPane.bottomAnchor="14.0" />
+                    <Button fx:id="buttonLangSk" alignment="CENTER_RIGHT" disable="false" font="$x3" layoutX="97.0" mnemonicParsing="false" onAction="#changeLanguageSk" prefWidth="80.0" style="    -fx-background-image: url(&quot;file:///C:/Users/Baxos/workspace/natankujClient/src/resources/skFlag.png&quot;);&#10;    -fx-background-size: 80 27;&#10;    -fx-background-repeat: no-repeat;&#10;    -fx-background-position: center;  " text="SVK" AnchorPane.bottomAnchor="14.0" />
+                  </children>
+                </AnchorPane>
+                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
+                  <children>
+                    <TabPane fx:id="tabPaneMain" prefHeight="406.0" prefWidth="661.0" style="" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                      <tabs>
+                        <Tab fx:id="tabCharts" closable="false" style="" text="Všeobecný prehĺad">
+                          <content>
+                            <AnchorPane id="Content" minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                              <children>
+                                <SplitPane dividerPositions="0.7505154639175258" focusTraversable="true" orientation="VERTICAL" prefHeight="487.0" prefWidth="666.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                  <items>
+                                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
+                                      <children>
+                                        <SplitPane dividerPositions="0.5010526315789474" focusTraversable="true" prefHeight="336.0" prefWidth="747.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                          <items>
+                                            <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0" style="-fx-background-color: #f5ffec;">
+                                              <children>
+                                                <LineChart fx:id="chartGasoline" alternativeColumnFillVisible="false" createSymbols="true" legendVisible="false" prefHeight="290.0" prefWidth="370.0" style="" title="NAT95" AnchorPane.bottomAnchor="69.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                                  <xAxis>
+                                                    <CategoryAxis side="BOTTOM" tickLabelFill="BLACK" />
+                                                  </xAxis>
+                                                  <yAxis>
+                                                    <NumberAxis side="LEFT" />
+                                                  </yAxis>
+                                                </LineChart>
+                                                <Label fx:id="labelAvgGasoline" font="$x1" layoutX="14.0" text="Priemerná cena:" AnchorPane.bottomAnchor="14.0" />
+                                                <Label fx:id="labelLowestGasoline" font="$x2" layoutX="14.0" text="Najlacnejšia ČS:" AnchorPane.bottomAnchor="41.0" />
+                                              </children>
+                                              <stylesheets>
+                                                <URL value="@charts.css" />
+                                              </stylesheets>
+                                            </AnchorPane>
+                                            <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0" snapToPixel="true" style="-fx-background-color: #ecf4ff;">
+                                              <children>
+                                                <LineChart fx:id="chartDiesel" legendVisible="false" prefHeight="290.0" prefWidth="369.0" style="" title="Diesel" AnchorPane.bottomAnchor="70.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                                  <xAxis>
+                                                    <CategoryAxis side="BOTTOM" />
+                                                  </xAxis>
+                                                  <yAxis>
+                                                    <NumberAxis side="LEFT" />
+                                                  </yAxis>
+                                                </LineChart>
+                                                <Label fx:id="labelAvgDiesel" font="$x1" layoutX="14.0" text="Priemerná cena:" AnchorPane.bottomAnchor="14.0" />
+                                                <Label fx:id="labelLowestDiesel" font="$x2" layoutX="14.0" text="Najlacnejšia ČS:" AnchorPane.bottomAnchor="41.0" />
+                                              </children>
+                                              <stylesheets>
+                                                <URL value="@charts.css" />
+                                              </stylesheets>
+                                            </AnchorPane>
+                                          </items>
+                                        </SplitPane>
+                                      </children>
+                                    </AnchorPane>
+                                    <AnchorPane maxHeight="118.0" minHeight="118.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0" style="">
+                                      <children>
+                                        <Label fx:id="labelStationsInDb" layoutX="14.0" layoutY="14.0" text="Počet ČS v databáze:" />
+                                        <Label fx:id="labelLastUpdate" layoutX="14.0" layoutY="49.0" text="Posledná aktualizácia:" />
+                                        <Label fx:id="labelTotalRatings" layoutX="14.0" layoutY="84.0" text="Hodnotení spolu:" />
+                                        <Label fx:id="userNameLabel" layoutY="14.0" text="Prihlásený:" AnchorPane.leftAnchor="377.0" />
+                                        <Label fx:id="labelTotalRatingsUser" layoutY="49.0" text="Hodnotení:" AnchorPane.leftAnchor="376.0" />
+                                        <Label fx:id="labelAvgUser" layoutY="84.0" text="Priemerné hodnotenie:" AnchorPane.leftAnchor="376.0" />
+                                      </children>
+                                    </AnchorPane>
+                                  </items>
+                                </SplitPane>
+                              </children>
+                            </AnchorPane>
+                          </content>
+                        </Tab>
+                        <Tab fx:id="tabSearchResults" closable="false" style="" text="Výsledky hľadania">
+                          <content>
+                            <AnchorPane id="Content" minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" style="">
+                              <children>
+                                <TableView fx:id="tableView" editable="true" prefHeight="487.0" prefWidth="666.0" style="" tableMenuButtonVisible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                  <columns>
+                                    <TableColumn maxWidth="5000.0" minWidth="10.0" prefWidth="100.0" text="Značka ČS" fx:id="colBrand" />
+                                    <TableColumn maxWidth="5000.0" minWidth="10.0" prefWidth="150.0" text="Mesto" fx:id="colCity" />
+                                    <TableColumn maxWidth="5000.0" minWidth="10.0" prefWidth="200.0" text="Lokalita" fx:id="colLocation" />
+                                    <TableColumn prefWidth="100.0" text="Hodnotenie" fx:id="colRating" />
+                                    <TableColumn prefWidth="75.0" text="Palivo" fx:id="colFuelName" />
+                                    <TableColumn prefWidth="150.0" text="Značka paliva" fx:id="colFuelBrand" />
+                                    <TableColumn prefWidth="75.0" text="Cena (€)" fx:id="colPrice" />
+                                    <TableColumn prefWidth="100.0" text="Dátum" fx:id="colDate" />
+                                  </columns>
+                                </TableView>
+                              </children>
+                            </AnchorPane>
+                          </content>
+                        </Tab>
+                      </tabs>
+                    </TabPane>
+                  </children>
+                </AnchorPane>
+              </items>
+            </SplitPane>
+          </children>
+        </AnchorPane>
+      </items>
+    </SplitPane>
+  </children>
+</AnchorPane>

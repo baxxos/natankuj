@@ -1,0 +1,28 @@
+<persistence xmlns="http://java.sun.com/xml/ns/persistence"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd"
+             version="2.0">
+   <persistence-unit name="manager1" transaction-type="JTA">
+      <provider>org.hibernate.ejb.HibernatePersistence</provider>
+      <jta-data-source>java:/PostgresDB</jta-data-source>
+      <jar-file>EJBTestAPI2.jar</jar-file>
+      <class>entities.User</class>
+      <class>entities.City</class>
+      <class>entities.Fuel</class>
+      <class>entities.FuelBrand</class>
+      <class>entities.FuelType</class>
+      <class>entities.Offer</class>
+      <class>entities.Price</class>
+      <class>entities.Rating</class>
+      <class>entities.Station</class>
+      <class>entities.StationBrand</class>
+      <shared-cache-mode>ENABLE_SELECTIVE</shared-cache-mode>
+      <validation-mode>CALLBACK</validation-mode>
+      <properties>
+         <property name="hibernate.dialect" value="org.hibernate.dialect.PostgreSQLDialect"/>
+         <property name="hibernate.hbm2ddl.auto" value="update"/>
+         <property name="hibernate.connection.driver_class" value="org.postgresql.Driver"/>
+         <property name="show_sql" value="true"/>
+      </properties>
+   </persistence-unit>
+</persistence>
